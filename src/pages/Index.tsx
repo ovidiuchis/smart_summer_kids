@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import Layout from '../components/Layout';
@@ -96,6 +97,7 @@ const Index = () => {
       {!selectedChild && !isParentMode && (
         <ChildSelector
           children={children}
+          completedActivities={completedActivities}
           onChildSelect={handleChildSelect}
           onParentMode={handleParentMode}
         />

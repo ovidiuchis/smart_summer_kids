@@ -108,7 +108,7 @@ const ChildDashboard: React.FC<ChildDashboardProps> = ({
           </div>
           <div className="w-full bg-gray-200 rounded-full h-4">
             <div 
-              className="kid-gradient-green h-4 rounded-full transition-all duration-500"
+              className="mature-gradient-green h-4 rounded-full transition-all duration-500"
               style={{ width: `${progressPercentage}%` }}
             ></div>
           </div>

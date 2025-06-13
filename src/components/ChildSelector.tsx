@@ -1,18 +1,26 @@
 
 import React from 'react';
-import { Child } from '@/hooks/useSupabaseData';
+import { Child, CompletedActivity } from '@/hooks/useSupabaseData';
 
 interface ChildSelectorProps {
   children: Child[];
+  completedActivities: CompletedActivity[];
   onChildSelect: (child: Child) => void;
   onParentMode: () => void;
 }
 
 const ChildSelector: React.FC<ChildSelectorProps> = ({ 
   children, 
+  completedActivities,
   onChildSelect, 
   onParentMode 
 }) => {
+  const getTotalPointsEarned = (childId: string) => {
+    return completedActivities
+      .filter(ca => ca.child_id === childId)
+      .reduce((total, ca) => total + ca.points_earned, 0);
+  };
+
   return (
     <div className="text-center animate-fade-in">
       <div className="mb-8">
@@ -26,21 +34,29 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({
 
       {children.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8">
-          {children.map((child) => (
-            <div
-              key={child.id}
-              onClick={() => onChildSelect(child)}
-              className="bg-white rounded-2xl p-8 shadow-lg hover-lift cursor-pointer border-4 border-transparent hover:border-blue-300 transition-all duration-300"
-            >
-              <div className="text-6xl mb-4">{child.avatar}</div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                {child.name}
-              </h3>
-              <div className="kid-gradient-blue text-white px-4 py-2 rounded-full text-lg font-bold">
-                ⭐ {child.total_points} puncte
+          {children.map((child) => {
+            const totalEarned = getTotalPointsEarned(child.id);
+            return (
+              <div
+                key={child.id}
+                onClick={() => onChildSelect(child)}
+                className="bg-white rounded-2xl p-8 shadow-lg hover-lift cursor-pointer border-4 border-transparent hover:border-blue-300 transition-all duration-300"
+              >
+                <div className="text-6xl mb-4">{child.avatar}</div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                  {child.name}
+                </h3>
+                <div className="space-y-2">
+                  <div className="mature-gradient-blue text-white px-4 py-2 rounded-full text-lg font-bold">
+                    ⭐ {child.total_points} puncte
+                  </div>
+                  <div className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium">
+                    📈 Total câștigat: {totalEarned} puncte
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="bg-white rounded-2xl p-8 shadow-lg max-w-md mx-auto mb-8">
