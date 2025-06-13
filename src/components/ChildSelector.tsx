@@ -27,7 +27,7 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({
           🌟 Tracker Activități de Vară 🌟
         </h1>
         <p className="text-xl text-gray-600">
-          Alege numele tău pentru a începe să câștigi puncte!
+          Alege numele tău pentru a colecta puncte în această Super Vară!
         </p>
       </div>
 
@@ -71,7 +71,7 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({
         <div className="bg-white rounded-2xl p-8 shadow-lg max-w-md mx-auto mb-8">
           <div className="text-4xl mb-4">👨‍👩‍👧‍👦</div>
           <p className="text-gray-600">
-            Nu există copii înregistrați încă. Accesează panoul de administrare
+            Nu există copii înregistrați încă. Accesează panoul de părinte
             pentru a adăuga copii.
           </p>
         </div>

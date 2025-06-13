@@ -65,8 +65,8 @@ const Auth = () => {
       <div className="min-h-[80vh] flex items-center justify-center">
         <div className="bg-white rounded-2xl p-8 shadow-lg max-w-md w-full">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              🌟 Activități de Vară 🌟
+            <h1 className="text-3xl font-bold text-gray-800 mb-2 whitespace-nowrap ">
+              🌟 Salutare Super Vară 🌟
             </h1>
             <p className="text-gray-600">
               {isLogin ? "Conectează-te la cont" : "Creează un cont nou"}
