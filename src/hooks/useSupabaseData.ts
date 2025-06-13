@@ -1,28 +1,27 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
-import { toast } from '@/hooks/use-toast';
+import { useAuth } from './useAuth';
 
 export interface Child {
   id: string;
+  parent_id: string;
   name: string;
   avatar: string;
   total_points: number;
-  parent_id: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface Activity {
   id: string;
+  parent_id: string;
   name: string;
   description: string | null;
   emoji: string;
   points: number;
   category: string;
   is_active: boolean;
-  parent_id: string;
   created_at: string;
   updated_at: string;
 }
@@ -35,8 +34,6 @@ export interface CompletedActivity {
   points_earned: number;
   approved_by_parent: boolean;
   created_at: string;
-  activity?: Activity;
-  child?: Child;
 }
 
 export const useSupabaseData = () => {
@@ -46,18 +43,18 @@ export const useSupabaseData = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [completedActivities, setCompletedActivities] = useState<CompletedActivity[]>([]);
 
-  // Fetch all data
   const fetchData = async () => {
     if (!user) return;
     
-    setLoading(true);
     try {
+      setLoading(true);
+
       // Fetch children
       const { data: childrenData, error: childrenError } = await supabase
         .from('children')
         .select('*')
         .eq('parent_id', user.id)
-        .order('name');
+        .order('created_at', { ascending: true });
 
       if (childrenError) throw childrenError;
       setChildren(childrenData || []);
@@ -68,7 +65,7 @@ export const useSupabaseData = () => {
         .select('*')
         .eq('parent_id', user.id)
         .eq('is_active', true)
-        .order('name');
+        .order('created_at', { ascending: true });
 
       if (activitiesError) throw activitiesError;
       setActivities(activitiesData || []);
@@ -76,12 +73,8 @@ export const useSupabaseData = () => {
       // Fetch completed activities
       const { data: completedData, error: completedError } = await supabase
         .from('completed_activities')
-        .select(`
-          *,
-          activity:activities(*),
-          child:children(*)
-        `)
-        .in('child_id', (childrenData || []).map(c => c.id))
+        .select('*')
+        .in('child_id', (childrenData || []).map(child => child.id))
         .order('completed_date', { ascending: false });
 
       if (completedError) throw completedError;
@@ -89,52 +82,39 @@ export const useSupabaseData = () => {
 
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast({
-        title: "Eroare la încărcarea datelor",
-        description: "Te rugăm să reîncerci.",
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
     }
   };
 
-  // Add child
-  const addChild = async (name: string, avatar: string = '👧') => {
+  useEffect(() => {
+    fetchData();
+  }, [user]);
+
+  const addChild = async (name: string, avatar: string) => {
     if (!user) return;
 
     try {
       const { data, error } = await supabase
         .from('children')
-        .insert([{ 
-          parent_id: user.id, 
-          name, 
-          avatar 
+        .insert([{
+          parent_id: user.id,
+          name,
+          avatar,
+          total_points: 0
         }])
         .select()
         .single();
 
       if (error) throw error;
-      
       setChildren(prev => [...prev, data]);
-      toast({
-        title: "Copil adăugat cu succes!",
-        description: `${name} a fost adăugat în listă.`,
-      });
-      
-      return { success: true };
+      return data;
     } catch (error) {
       console.error('Error adding child:', error);
-      toast({
-        title: "Eroare la adăugarea copilului",
-        description: "Te rugăm să încerci din nou.",
-        variant: "destructive",
-      });
-      return { success: false };
+      throw error;
     }
   };
 
-  // Remove child
   const removeChild = async (childId: string) => {
     try {
       const { error } = await supabase
@@ -143,60 +123,40 @@ export const useSupabaseData = () => {
         .eq('id', childId);
 
       if (error) throw error;
-      
-      setChildren(prev => prev.filter(c => c.id !== childId));
-      toast({
-        title: "Copil eliminat",
-        description: "Copilul a fost eliminat din listă.",
-      });
-      
-      return { success: true };
+      setChildren(prev => prev.filter(child => child.id !== childId));
     } catch (error) {
       console.error('Error removing child:', error);
-      toast({
-        title: "Eroare la eliminarea copilului",
-        description: "Te rugăm să încerci din nou.",
-        variant: "destructive",
-      });
-      return { success: false };
+      throw error;
     }
   };
 
-  // Add activity
-  const addActivity = async (activity: Omit<Activity, 'id' | 'parent_id' | 'created_at' | 'updated_at'>) => {
+  const addActivity = async (name: string, description: string, emoji: string, points: number, category: string) => {
     if (!user) return;
 
     try {
       const { data, error } = await supabase
         .from('activities')
-        .insert([{ 
-          ...activity,
-          parent_id: user.id 
+        .insert([{
+          parent_id: user.id,
+          name,
+          description,
+          emoji,
+          points,
+          category,
+          is_active: true
         }])
         .select()
         .single();
 
       if (error) throw error;
-      
       setActivities(prev => [...prev, data]);
-      toast({
-        title: "Activitate adăugată cu succes!",
-        description: `${activity.name} a fost adăugată în listă.`,
-      });
-      
-      return { success: true };
+      return data;
     } catch (error) {
       console.error('Error adding activity:', error);
-      toast({
-        title: "Eroare la adăugarea activității",
-        description: "Te rugăm să încerci din nou.",
-        variant: "destructive",
-      });
-      return { success: false };
+      throw error;
     }
   };
 
-  // Remove activity
   const removeActivity = async (activityId: string) => {
     try {
       const { error } = await supabase
@@ -205,85 +165,49 @@ export const useSupabaseData = () => {
         .eq('id', activityId);
 
       if (error) throw error;
-      
-      setActivities(prev => prev.filter(a => a.id !== activityId));
-      toast({
-        title: "Activitate eliminată",
-        description: "Activitatea a fost eliminată din listă.",
-      });
-      
-      return { success: true };
+      setActivities(prev => prev.filter(activity => activity.id !== activityId));
     } catch (error) {
       console.error('Error removing activity:', error);
-      toast({
-        title: "Eroare la eliminarea activității",
-        description: "Te rugăm să încerci din nou.",
-        variant: "destructive",
-      });
-      return { success: false };
+      throw error;
     }
   };
 
-  // Complete activity
-  const completeActivity = async (childId: string, activityId: string, date: string = new Date().toISOString().split('T')[0]) => {
+  const completeActivity = async (childId: string, activityId: string) => {
     try {
       const activity = activities.find(a => a.id === activityId);
-      if (!activity) throw new Error('Activity not found');
+      if (!activity) return;
+
+      const today = new Date().toISOString().split('T')[0];
 
       const { data, error } = await supabase
         .from('completed_activities')
         .insert([{
           child_id: childId,
           activity_id: activityId,
-          completed_date: date,
+          completed_date: today,
           points_earned: activity.points,
           approved_by_parent: false
         }])
-        .select(`
-          *,
-          activity:activities(*),
-          child:children(*)
-        `)
+        .select()
         .single();
 
       if (error) throw error;
+      setCompletedActivities(prev => [...prev, data]);
       
-      setCompletedActivities(prev => [data, ...prev]);
-      
-      // Update child's total points in local state
+      // Update child's total points locally
       setChildren(prev => prev.map(child => 
         child.id === childId 
           ? { ...child, total_points: child.total_points + activity.points }
           : child
       ));
 
-      toast({
-        title: "Activitate completată! 🎉",
-        description: `Ai câștigat ${activity.points} puncte pentru "${activity.name}"!`,
-      });
-      
-      return { success: true };
-    } catch (error: any) {
+      return data;
+    } catch (error) {
       console.error('Error completing activity:', error);
-      
-      if (error.code === '23505') {
-        toast({
-          title: "Activitate deja completată",
-          description: "Această activitate a fost deja completată astăzi.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Eroare la completarea activității",
-          description: "Te rugăm să încerci din nou.",
-          variant: "destructive",
-        });
-      }
-      return { success: false };
+      throw error;
     }
   };
 
-  // Approve completed activity
   const approveActivity = async (completedActivityId: string) => {
     try {
       const { error } = await supabase
@@ -298,29 +222,11 @@ export const useSupabaseData = () => {
           ? { ...ca, approved_by_parent: true }
           : ca
       ));
-
-      toast({
-        title: "Activitate aprobată!",
-        description: "Activitatea a fost aprobată cu succes.",
-      });
-      
-      return { success: true };
     } catch (error) {
       console.error('Error approving activity:', error);
-      toast({
-        title: "Eroare la aprobarea activității",
-        description: "Te rugăm să încerci din nou.",
-        variant: "destructive",
-      });
-      return { success: false };
+      throw error;
     }
   };
-
-  useEffect(() => {
-    if (user) {
-      fetchData();
-    }
-  }, [user]);
 
   return {
     loading,
@@ -333,6 +239,6 @@ export const useSupabaseData = () => {
     removeActivity,
     completeActivity,
     approveActivity,
-    refreshData: fetchData
+    refetch: fetchData
   };
 };
