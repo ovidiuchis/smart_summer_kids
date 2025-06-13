@@ -1,73 +1,106 @@
-# Welcome to your Lovable project
+# 🌞 Kids Summer Activity Tracker — *Super Vara*
 
-## Project info
+A playful, colorful web app to help parents and kids track and reward summer activities together.
 
-**URL**: https://lovable.dev/projects/dfd9cd33-5879-45b1-ace8-4e84a6d807b7
+Hosted live on **Vercel** 🚀:
+🔗 [super-vara.vercel.app](https://super-vara.vercel.app/)
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🌟 Features
 
-**Use Lovable**
+* 🔐 **Parent Registration** — parents can sign up, enroll their children, and manage their family account.
+* 👧 **Child Profiles** — kids can select avatars (emoji or photo-based) for a personal experience.
+* 🎯 **Activity Tracking** — children mark completed tasks, parents approve them.
+* 📈 **Points System** — completed activities earn points that accumulate over time.
+* 🗕️ **Daily Progress Bars** — kids can see their daily progress visually.
+* 🔔 **Smart Alerts** — reminders and notifications to stay engaged and motivated.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/dfd9cd33-5879-45b1-ace8-4e84a6d807b7) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🔧 Tech Stack
 
-**Use your preferred IDE**
+Built with modern, performant technologies:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+* ⚡ Vite
+* 🔤 TypeScript
+* ⚛️ React
+* 🎨 Tailwind CSS
+* 🤩 shadcn-ui
+* ☁️ Hosted on Vercel
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## 🚀 Editing & Development
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+You have multiple ways to edit and improve your application:
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 1️⃣ Use Lovable Dev (no code)
 
-# Step 3: Install the necessary dependencies.
-npm i
+* Visit your [Lovable Project](https://lovable.dev/projects/dfd9cd33-5879-45b1-ace8-4e84a6d807b7).
+* Prompt changes directly.
+* All changes are committed automatically.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### 2️⃣ Edit Locally with Your IDE
+
+> Requirements: Node.js & npm (recommended install via [nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
+
+```bash
+# Clone the repository
+git clone https://github.com/ovidiuchis/smart_summer_kids.git
+
+# Navigate into project directory
+cd super-vara
+
+# Install dependencies
+npm install
+
+# Start local development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### 3️⃣ Edit Directly on GitHub
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+* Navigate to any file in your repo.
+* Click ✏️ Edit, make your changes, and commit.
 
-**Use GitHub Codespaces**
+### 4️⃣ Use GitHub Codespaces
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+* Open your repository.
+* Click **Code > Codespaces > New codespace**.
+* Edit fully online.
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 🌎 Deployment
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+The project is hosted live on **Vercel** at:
+🔗 [https://super-vara.vercel.app/](https://super-vara.vercel.app/)
 
-## How can I deploy this project?
+To deploy new changes:
 
-Simply open [Lovable](https://lovable.dev/projects/dfd9cd33-5879-45b1-ace8-4e84a6d807b7) and click on Share -> Publish.
+* Commit code to main.
+* Vercel automatically builds & deploys your app.
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+## 🔑 Custom Domain
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+* Go to **Project > Settings > Domains > Connect Domain** on Vercel.
+* Full guide: [Vercel Domains Docs](https://vercel.com/docs/projects/custom-domains)
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+---
+
+## 💡 About the Project
+
+This app was built for personal family use to:
+
+* Encourage kids with positive reinforcement.
+* Gamify daily tasks during summer vacation.
+* Offer parents visibility into children's progress.
+
+---
+
+✅ **Built with ❤️ using Lovable Dev + Vercel.**
+
+---
