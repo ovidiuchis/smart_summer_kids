@@ -1,6 +1,5 @@
-
-import React from 'react';
-import { Child, CompletedActivity } from '@/hooks/useSupabaseData';
+import React from "react";
+import { Child, CompletedActivity } from "@/hooks/useSupabaseData";
 
 interface ChildSelectorProps {
   children: Child[];
@@ -9,15 +8,15 @@ interface ChildSelectorProps {
   onParentMode: () => void;
 }
 
-const ChildSelector: React.FC<ChildSelectorProps> = ({ 
-  children, 
+const ChildSelector: React.FC<ChildSelectorProps> = ({
+  children,
   completedActivities,
-  onChildSelect, 
-  onParentMode 
+  onChildSelect,
+  onParentMode,
 }) => {
   const getTotalPointsEarned = (childId: string) => {
     return completedActivities
-      .filter(ca => ca.child_id === childId)
+      .filter((ca) => ca.child_id === childId)
       .reduce((total, ca) => total + ca.points_earned, 0);
   };
 
@@ -42,7 +41,17 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({
                 onClick={() => onChildSelect(child)}
                 className="bg-white rounded-2xl p-8 shadow-lg hover-lift cursor-pointer border-4 border-transparent hover:border-blue-300 transition-all duration-300"
               >
-                <div className="text-6xl mb-4">{child.avatar}</div>
+                <div className="mb-4">
+                  {child.avatar && child.avatar.startsWith("data:image") ? (
+                    <img
+                      src={child.avatar}
+                      alt={child.name}
+                      className="w-16 h-16 rounded-full object-cover border-2 border-gray-300 mx-auto"
+                    />
+                  ) : (
+                    <span className="text-6xl">{child.avatar}</span>
+                  )}
+                </div>
                 <h3 className="text-2xl font-bold text-gray-800 mb-2">
                   {child.name}
                 </h3>
@@ -62,7 +71,8 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({
         <div className="bg-white rounded-2xl p-8 shadow-lg max-w-md mx-auto mb-8">
           <div className="text-4xl mb-4">👨‍👩‍👧‍👦</div>
           <p className="text-gray-600">
-            Nu există copii înregistrați încă. Accesează panoul de administrare pentru a adăuga copii.
+            Nu există copii înregistrați încă. Accesează panoul de administrare
+            pentru a adăuga copii.
           </p>
         </div>
       )}
