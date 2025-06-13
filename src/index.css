@@ -3,11 +3,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Child-friendly design system with bright, playful colors */
+/* Mature design system with subtle, professional colors */
 
 @layer base {
   :root {
-    --background: 245 248 255;
+    --background: 248 250 252;
     --foreground: 15 23 42;
 
     --card: 255 255 255;
@@ -25,7 +25,7 @@
     --muted: 248 250 252;
     --muted-foreground: 100 116 139;
 
-    --accent: 168 85 247;
+    --accent: 99 102 241;
     --accent-foreground: 255 255 255;
 
     --destructive: 239 68 68;
@@ -35,15 +35,15 @@
     --input: 226 232 240;
     --ring: 59 130 246;
 
-    --radius: 1rem;
+    --radius: 0.5rem;
 
-    /* Custom playful colors */
-    --kid-blue: 59 130 246;
-    --kid-green: 34 197 94;
-    --kid-orange: 251 146 60;
-    --kid-purple: 168 85 247;
-    --kid-pink: 236 72 153;
-    --kid-yellow: 250 204 21;
+    /* Mature color scheme */
+    --mature-blue: 59 130 246;
+    --mature-green: 34 197 94;
+    --mature-orange: 249 115 22;
+    --mature-purple: 99 102 241;
+    --mature-pink: 219 39 119;
+    --mature-gray: 75 85 99;
   }
 
   .dark {
@@ -65,7 +65,7 @@
     --muted: 51 65 85;
     --muted-foreground: 148 163 184;
 
-    --accent: 168 85 247;
+    --accent: 99 102 241;
     --accent-foreground: 255 255 255;
 
     --destructive: 239 68 68;
@@ -83,46 +83,48 @@
   }
 
   body {
-    @apply bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 text-foreground;
+    @apply bg-gray-50 text-foreground;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }
 
 @layer utilities {
-  .kid-gradient-blue {
-    @apply bg-gradient-to-r from-blue-400 to-blue-600;
+  .mature-gradient-blue {
+    @apply bg-gradient-to-r from-blue-500 to-blue-600;
   }
   
-  .kid-gradient-green {
-    @apply bg-gradient-to-r from-green-400 to-green-600;
+  .mature-gradient-green {
+    @apply bg-gradient-to-r from-green-500 to-green-600;
   }
   
-  .kid-gradient-orange {
-    @apply bg-gradient-to-r from-orange-400 to-orange-600;
+  .mature-gradient-orange {
+    @apply bg-gradient-to-r from-orange-500 to-orange-600;
   }
   
-  .kid-gradient-purple {
-    @apply bg-gradient-to-r from-purple-400 to-purple-600;
+  .mature-gradient-purple {
+    @apply bg-gradient-to-r from-indigo-500 to-indigo-600;
   }
   
-  .kid-gradient-pink {
-    @apply bg-gradient-to-r from-pink-400 to-pink-600;
+  .mature-gradient-pink {
+    @apply bg-gradient-to-r from-pink-600 to-pink-700;
   }
   
   .hover-lift {
-    @apply transition-all duration-200 hover:scale-105 hover:shadow-lg;
+    @apply transition-all duration-200 hover:scale-102 hover:shadow-md;
   }
   
-  .bounce-gentle {
-    animation: bounce-gentle 2s infinite;
+  .fade-in {
+    animation: fade-in 0.3s ease-out;
   }
 }
 
-@keyframes bounce-gentle {
-  0%, 100% {
-    transform: translateY(0);
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
   }
-  50% {
-    transform: translateY(-4px);
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import Layout from '../components/Layout';
@@ -20,7 +19,8 @@ const Index = () => {
     addActivity,
     removeActivity,
     completeActivity,
-    approveActivity
+    approveActivity,
+    payoutPoints
   } = useSupabaseData();
 
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
@@ -87,7 +87,7 @@ const Index = () => {
       <div className="flex justify-end mb-4">
         <button
           onClick={handleSignOut}
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-medium transition-colors duration-200"
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
         >
           Deconectează-te
         </button>
@@ -122,6 +122,7 @@ const Index = () => {
           onAddActivity={addActivity}
           onRemoveActivity={removeActivity}
           onApproveActivity={approveActivity}
+          onPayoutPoints={payoutPoints}
         />
       )}
     </Layout>

@@ -34,6 +34,8 @@ export interface CompletedActivity {
   points_earned: number;
   approved_by_parent: boolean;
   created_at: string;
+  child?: Child;
+  activity?: Activity;
 }
 
 export const useSupabaseData = () => {
@@ -70,10 +72,14 @@ export const useSupabaseData = () => {
       if (activitiesError) throw activitiesError;
       setActivities(activitiesData || []);
 
-      // Fetch completed activities
+      // Fetch completed activities with joined data
       const { data: completedData, error: completedError } = await supabase
         .from('completed_activities')
-        .select('*')
+        .select(`
+          *,
+          child:children(*),
+          activity:activities(*)
+        `)
         .in('child_id', (childrenData || []).map(child => child.id))
         .order('completed_date', { ascending: false });
 
@@ -130,7 +136,13 @@ export const useSupabaseData = () => {
     }
   };
 
-  const addActivity = async (name: string, description: string, emoji: string, points: number, category: string) => {
+  const addActivity = async (activityData: {
+    name: string;
+    description: string;
+    emoji: string;
+    points: number;
+    category: string;
+  }) => {
     if (!user) return;
 
     try {
@@ -138,11 +150,7 @@ export const useSupabaseData = () => {
         .from('activities')
         .insert([{
           parent_id: user.id,
-          name,
-          description,
-          emoji,
-          points,
-          category,
+          ...activityData,
           is_active: true
         }])
         .select()
@@ -188,7 +196,11 @@ export const useSupabaseData = () => {
           points_earned: activity.points,
           approved_by_parent: false
         }])
-        .select()
+        .select(`
+          *,
+          child:children(*),
+          activity:activities(*)
+        `)
         .single();
 
       if (error) throw error;
@@ -228,6 +240,26 @@ export const useSupabaseData = () => {
     }
   };
 
+  const payoutPoints = async (childId: string) => {
+    try {
+      const { error } = await supabase
+        .from('children')
+        .update({ total_points: 0, updated_at: new Date().toISOString() })
+        .eq('id', childId);
+
+      if (error) throw error;
+      
+      setChildren(prev => prev.map(child => 
+        child.id === childId 
+          ? { ...child, total_points: 0 }
+          : child
+      ));
+    } catch (error) {
+      console.error('Error paying out points:', error);
+      throw error;
+    }
+  };
+
   return {
     loading,
     children,
@@ -239,6 +271,7 @@ export const useSupabaseData = () => {
     removeActivity,
     completeActivity,
     approveActivity,
+    payoutPoints,
     refetch: fetchData
   };
 };
