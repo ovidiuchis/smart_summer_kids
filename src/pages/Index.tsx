@@ -21,6 +21,8 @@ const Index = () => {
     completeActivity,
     approveActivity,
     payoutPoints,
+    editActivity,
+    editChild,
   } = useSupabaseData();
 
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
@@ -125,6 +127,8 @@ const Index = () => {
           onApproveActivity={approveActivity}
           onPayoutPoints={payoutPoints}
           onSignOut={handleSignOut}
+          onEditActivity={editActivity}
+          onEditChild={editChild}
         />
       )}
     </Layout>

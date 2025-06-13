@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import { Child, Activity, CompletedActivity } from "@/hooks/useSupabaseData";
 import Header from "./Header";
-import { Plus, Trash2, Check, DollarSign, Upload, Camera } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Check,
+  DollarSign,
+  Upload,
+  Camera,
+  Pencil,
+} from "lucide-react";
 
 interface ParentDashboardProps {
   children: Child[];
@@ -21,6 +29,15 @@ interface ParentDashboardProps {
   onApproveActivity: (completedActivityId: string) => void;
   onPayoutPoints: (childId: string) => void;
   onSignOut?: () => void;
+  onEditActivity?: (activity: {
+    id: string;
+    name: string;
+    description: string;
+    emoji: string;
+    points: number;
+    category: string;
+  }) => void;
+  onEditChild?: (child: { id: string; name: string; avatar: string }) => void;
 }
 
 const ParentDashboard: React.FC<ParentDashboardProps> = ({
@@ -35,6 +52,8 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
   onApproveActivity,
   onPayoutPoints,
   onSignOut,
+  onEditActivity,
+  onEditChild,
 }) => {
   const [showAddChild, setShowAddChild] = useState(false);
   const [showAddActivity, setShowAddActivity] = useState(false);
@@ -47,6 +66,19 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
     points: 10,
     category: "general",
   });
+  const [editActivity, setEditActivity] = useState<null | {
+    id: string;
+    name: string;
+    description: string;
+    emoji: string;
+    points: number;
+    category: string;
+  }>(null);
+  const [editChild, setEditChild] = useState<null | {
+    id: string;
+    name: string;
+    avatar: string;
+  }>(null);
 
   const totalPointsEarned = children.reduce(
     (sum, child) => sum + child.total_points,
@@ -366,6 +398,12 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 >
                   <Trash2 size={16} />
                 </button>
+                <button
+                  onClick={() => setEditChild({ ...child })}
+                  className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded transition-colors ml-1"
+                >
+                  <Pencil size={16} />
+                </button>
               </div>
             </div>
           ))}
@@ -510,6 +548,12 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                   >
                     <Trash2 size={12} />
                   </button>
+                  <button
+                    onClick={() => setEditActivity({ ...activity })}
+                    className="bg-blue-500 hover:bg-blue-600 text-white p-1 rounded transition-colors ml-1"
+                  >
+                    <Pencil size={12} />
+                  </button>
                 </div>
               </div>
               <h3 className="font-semibold text-gray-800 mb-1">
@@ -527,6 +571,157 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
           ))}
         </div>
       </div>
+
+      {/* Edit Activity Modal */}
+      {editActivity && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Editează activitatea</h2>
+            <div className="space-y-4">
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                placeholder="Nume activitate"
+                value={editActivity.name}
+                onChange={(e) =>
+                  setEditActivity({ ...editActivity, name: e.target.value })
+                }
+              />
+              <textarea
+                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                placeholder="Descriere (opțional)"
+                value={editActivity.description}
+                onChange={(e) =>
+                  setEditActivity({
+                    ...editActivity,
+                    description: e.target.value,
+                  })
+                }
+              />
+              <div className="flex gap-2 items-center">
+                <label className="font-medium">Emoji:</label>
+                <select
+                  className="border border-gray-300 rounded-lg px-2 py-1"
+                  value={editActivity.emoji}
+                  onChange={(e) =>
+                    setEditActivity({ ...editActivity, emoji: e.target.value })
+                  }
+                >
+                  {emojiOptions.map((emoji) => (
+                    <option key={emoji} value={emoji}>
+                      {emoji}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex gap-2 items-center">
+                <label className="font-medium">Puncte:</label>
+                <input
+                  type="number"
+                  className="border border-gray-300 rounded-lg px-2 py-1 w-24"
+                  value={editActivity.points}
+                  onChange={(e) =>
+                    setEditActivity({
+                      ...editActivity,
+                      points: Number(e.target.value),
+                    })
+                  }
+                  min={1}
+                />
+              </div>
+              <div className="flex gap-2 items-center">
+                <label className="font-medium">Categorie:</label>
+                <select
+                  className="border border-gray-300 rounded-lg px-2 py-1"
+                  value={editActivity.category}
+                  onChange={(e) =>
+                    setEditActivity({
+                      ...editActivity,
+                      category: e.target.value,
+                    })
+                  }
+                >
+                  {categoryOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-2 mt-6 justify-end">
+              <button
+                onClick={() => setEditActivity(null)}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
+              >
+                Anulează
+              </button>
+              <button
+                onClick={() => {
+                  if (onEditActivity) onEditActivity(editActivity);
+                  setEditActivity(null);
+                }}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+              >
+                Salvează
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Child Modal */}
+      {editChild && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Editează copilul</h2>
+            <div className="space-y-4">
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                placeholder="Nume copil"
+                value={editChild.name}
+                onChange={(e) =>
+                  setEditChild({ ...editChild, name: e.target.value })
+                }
+              />
+              <div className="flex gap-2 items-center">
+                <label className="font-medium">Avatar:</label>
+                <select
+                  className="border border-gray-300 rounded-lg px-2 py-1"
+                  value={editChild.avatar}
+                  onChange={(e) =>
+                    setEditChild({ ...editChild, avatar: e.target.value })
+                  }
+                >
+                  {avatarOptions.map((avatar) => (
+                    <option key={avatar} value={avatar}>
+                      {avatar}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-2 mt-6 justify-end">
+              <button
+                onClick={() => setEditChild(null)}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
+              >
+                Anulează
+              </button>
+              <button
+                onClick={() => {
+                  if (onEditChild) onEditChild(editChild);
+                  setEditChild(null);
+                }}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+              >
+                Salvează
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

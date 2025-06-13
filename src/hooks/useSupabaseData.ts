@@ -1,7 +1,6 @@
-
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './useAuth';
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "./useAuth";
 
 export interface Child {
   id: string;
@@ -43,51 +42,57 @@ export const useSupabaseData = () => {
   const [loading, setLoading] = useState(true);
   const [children, setChildren] = useState<Child[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [completedActivities, setCompletedActivities] = useState<CompletedActivity[]>([]);
+  const [completedActivities, setCompletedActivities] = useState<
+    CompletedActivity[]
+  >([]);
 
   const fetchData = async () => {
     if (!user) return;
-    
+
     try {
       setLoading(true);
 
       // Fetch children
       const { data: childrenData, error: childrenError } = await supabase
-        .from('children')
-        .select('*')
-        .eq('parent_id', user.id)
-        .order('created_at', { ascending: true });
+        .from("children")
+        .select("*")
+        .eq("parent_id", user.id)
+        .order("created_at", { ascending: true });
 
       if (childrenError) throw childrenError;
       setChildren(childrenData || []);
 
       // Fetch activities
       const { data: activitiesData, error: activitiesError } = await supabase
-        .from('activities')
-        .select('*')
-        .eq('parent_id', user.id)
-        .eq('is_active', true)
-        .order('created_at', { ascending: true });
+        .from("activities")
+        .select("*")
+        .eq("parent_id", user.id)
+        .eq("is_active", true)
+        .order("created_at", { ascending: true });
 
       if (activitiesError) throw activitiesError;
       setActivities(activitiesData || []);
 
       // Fetch completed activities with joined data
       const { data: completedData, error: completedError } = await supabase
-        .from('completed_activities')
-        .select(`
+        .from("completed_activities")
+        .select(
+          `
           *,
           child:children(*),
           activity:activities(*)
-        `)
-        .in('child_id', (childrenData || []).map(child => child.id))
-        .order('completed_date', { ascending: false });
+        `
+        )
+        .in(
+          "child_id",
+          (childrenData || []).map((child) => child.id)
+        )
+        .order("completed_date", { ascending: false });
 
       if (completedError) throw completedError;
       setCompletedActivities(completedData || []);
-
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
@@ -102,21 +107,23 @@ export const useSupabaseData = () => {
 
     try {
       const { data, error } = await supabase
-        .from('children')
-        .insert([{
-          parent_id: user.id,
-          name,
-          avatar,
-          total_points: 0
-        }])
+        .from("children")
+        .insert([
+          {
+            parent_id: user.id,
+            name,
+            avatar,
+            total_points: 0,
+          },
+        ])
         .select()
         .single();
 
       if (error) throw error;
-      setChildren(prev => [...prev, data]);
+      setChildren((prev) => [...prev, data]);
       return data;
     } catch (error) {
-      console.error('Error adding child:', error);
+      console.error("Error adding child:", error);
       throw error;
     }
   };
@@ -124,14 +131,14 @@ export const useSupabaseData = () => {
   const removeChild = async (childId: string) => {
     try {
       const { error } = await supabase
-        .from('children')
+        .from("children")
         .delete()
-        .eq('id', childId);
+        .eq("id", childId);
 
       if (error) throw error;
-      setChildren(prev => prev.filter(child => child.id !== childId));
+      setChildren((prev) => prev.filter((child) => child.id !== childId));
     } catch (error) {
-      console.error('Error removing child:', error);
+      console.error("Error removing child:", error);
       throw error;
     }
   };
@@ -147,20 +154,22 @@ export const useSupabaseData = () => {
 
     try {
       const { data, error } = await supabase
-        .from('activities')
-        .insert([{
-          parent_id: user.id,
-          ...activityData,
-          is_active: true
-        }])
+        .from("activities")
+        .insert([
+          {
+            parent_id: user.id,
+            ...activityData,
+            is_active: true,
+          },
+        ])
         .select()
         .single();
 
       if (error) throw error;
-      setActivities(prev => [...prev, data]);
+      setActivities((prev) => [...prev, data]);
       return data;
     } catch (error) {
-      console.error('Error adding activity:', error);
+      console.error("Error adding activity:", error);
       throw error;
     }
   };
@@ -168,54 +177,62 @@ export const useSupabaseData = () => {
   const removeActivity = async (activityId: string) => {
     try {
       const { error } = await supabase
-        .from('activities')
+        .from("activities")
         .update({ is_active: false })
-        .eq('id', activityId);
+        .eq("id", activityId);
 
       if (error) throw error;
-      setActivities(prev => prev.filter(activity => activity.id !== activityId));
+      setActivities((prev) =>
+        prev.filter((activity) => activity.id !== activityId)
+      );
     } catch (error) {
-      console.error('Error removing activity:', error);
+      console.error("Error removing activity:", error);
       throw error;
     }
   };
 
   const completeActivity = async (childId: string, activityId: string) => {
     try {
-      const activity = activities.find(a => a.id === activityId);
+      const activity = activities.find((a) => a.id === activityId);
       if (!activity) return;
 
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split("T")[0];
 
       const { data, error } = await supabase
-        .from('completed_activities')
-        .insert([{
-          child_id: childId,
-          activity_id: activityId,
-          completed_date: today,
-          points_earned: activity.points,
-          approved_by_parent: false
-        }])
-        .select(`
+        .from("completed_activities")
+        .insert([
+          {
+            child_id: childId,
+            activity_id: activityId,
+            completed_date: today,
+            points_earned: activity.points,
+            approved_by_parent: false,
+          },
+        ])
+        .select(
+          `
           *,
           child:children(*),
           activity:activities(*)
-        `)
+        `
+        )
         .single();
 
       if (error) throw error;
-      setCompletedActivities(prev => [...prev, data]);
-      
+      setCompletedActivities((prev) => [...prev, data]);
+
       // Update child's total points locally
-      setChildren(prev => prev.map(child => 
-        child.id === childId 
-          ? { ...child, total_points: child.total_points + activity.points }
-          : child
-      ));
+      setChildren((prev) =>
+        prev.map((child) =>
+          child.id === childId
+            ? { ...child, total_points: child.total_points + activity.points }
+            : child
+        )
+      );
 
       return data;
     } catch (error) {
-      console.error('Error completing activity:', error);
+      console.error("Error completing activity:", error);
       throw error;
     }
   };
@@ -223,19 +240,21 @@ export const useSupabaseData = () => {
   const approveActivity = async (completedActivityId: string) => {
     try {
       const { error } = await supabase
-        .from('completed_activities')
+        .from("completed_activities")
         .update({ approved_by_parent: true })
-        .eq('id', completedActivityId);
+        .eq("id", completedActivityId);
 
       if (error) throw error;
-      
-      setCompletedActivities(prev => prev.map(ca => 
-        ca.id === completedActivityId 
-          ? { ...ca, approved_by_parent: true }
-          : ca
-      ));
+
+      setCompletedActivities((prev) =>
+        prev.map((ca) =>
+          ca.id === completedActivityId
+            ? { ...ca, approved_by_parent: true }
+            : ca
+        )
+      );
     } catch (error) {
-      console.error('Error approving activity:', error);
+      console.error("Error approving activity:", error);
       throw error;
     }
   };
@@ -243,19 +262,76 @@ export const useSupabaseData = () => {
   const payoutPoints = async (childId: string) => {
     try {
       const { error } = await supabase
-        .from('children')
+        .from("children")
         .update({ total_points: 0, updated_at: new Date().toISOString() })
-        .eq('id', childId);
+        .eq("id", childId);
 
       if (error) throw error;
-      
-      setChildren(prev => prev.map(child => 
-        child.id === childId 
-          ? { ...child, total_points: 0 }
-          : child
-      ));
+
+      setChildren((prev) =>
+        prev.map((child) =>
+          child.id === childId ? { ...child, total_points: 0 } : child
+        )
+      );
     } catch (error) {
-      console.error('Error paying out points:', error);
+      console.error("Error paying out points:", error);
+      throw error;
+    }
+  };
+
+  const editActivity = async (activityData: {
+    id: string;
+    name: string;
+    description: string;
+    emoji: string;
+    points: number;
+    category: string;
+  }) => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from("activities")
+        .update({
+          name: activityData.name,
+          description: activityData.description,
+          emoji: activityData.emoji,
+          points: activityData.points,
+          category: activityData.category,
+        })
+        .eq("id", activityData.id)
+        .eq("parent_id", user.id)
+        .select()
+        .single();
+      if (error) throw error;
+      setActivities((prev) => prev.map((a) => (a.id === data.id ? data : a)));
+      return data;
+    } catch (error) {
+      console.error("Error editing activity:", error);
+      throw error;
+    }
+  };
+
+  const editChild = async (childData: {
+    id: string;
+    name: string;
+    avatar: string;
+  }) => {
+    try {
+      const { data, error } = await supabase
+        .from("children")
+        .update({
+          name: childData.name,
+          avatar: childData.avatar,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", childData.id)
+        .select()
+        .single();
+      if (error) throw error;
+      setChildren((prev) => prev.map((c) => (c.id === data.id ? data : c)));
+      return data;
+    } catch (error) {
+      console.error("Error editing child:", error);
       throw error;
     }
   };
@@ -272,6 +348,8 @@ export const useSupabaseData = () => {
     completeActivity,
     approveActivity,
     payoutPoints,
-    refetch: fetchData
+    editActivity,
+    editChild,
+    refetch: fetchData,
   };
 };
