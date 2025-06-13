@@ -110,7 +110,7 @@
   }
   
   .hover-lift {
-    @apply transition-all duration-200 hover:scale-102 hover:shadow-md;
+    @apply transition-all duration-200 hover:scale-105 hover:shadow-md;
   }
   
   .fade-in {
