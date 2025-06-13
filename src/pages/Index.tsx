@@ -1,23 +1,62 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import ChildSelector from '../components/ChildSelector';
 import ChildDashboard from '../components/ChildDashboard';
 import ParentDashboard from '../components/ParentDashboard';
-import { useAppState } from '../hooks/useAppState';
-import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { useSupabaseData, Child } from '@/hooks/useSupabaseData';
 
 const Index = () => {
+  const { user, loading: authLoading, signOut } = useAuth();
   const {
+    loading,
     children,
     activities,
-    selectedChild,
-    setSelectedChild,
-    isParentMode,
-    setIsParentMode
-  } = useAppState();
+    completedActivities,
+    addChild,
+    removeChild,
+    addActivity,
+    removeActivity,
+    completeActivity,
+    approveActivity
+  } = useSupabaseData();
 
-  const handleChildSelect = (child: any) => {
+  const [selectedChild, setSelectedChild] = useState<Child | null>(null);
+  const [isParentMode, setIsParentMode] = useState(false);
+
+  if (authLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="text-4xl mb-4">⏳</div>
+            <p className="text-gray-600">Se încarcă...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="text-4xl mb-4">📊</div>
+            <p className="text-gray-600">Se încarcă datele...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  const handleChildSelect = (child: Child) => {
     setSelectedChild(child);
     setIsParentMode(false);
   };
@@ -32,21 +71,28 @@ const Index = () => {
     setIsParentMode(false);
   };
 
-  const handleCompleteActivity = (activityId: string) => {
-    const activity = activities.find(a => a.id === activityId);
-    if (activity && selectedChild) {
-      // In a real app, this would update the database
-      console.log(`${selectedChild.name} completed: ${activity.name} (+${activity.points} points)`);
-      
-      toast({
-        title: "Great job! 🎉",
-        description: `You earned ${activity.points} points for "${activity.name}"!`,
-      });
+  const handleCompleteActivity = async (activityId: string) => {
+    if (selectedChild) {
+      await completeActivity(selectedChild.id, activityId);
     }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
   };
 
   return (
     <Layout>
+      {/* Sign out button */}
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={handleSignOut}
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-medium transition-colors duration-200"
+        >
+          Deconectează-te
+        </button>
+      </div>
+
       {!selectedChild && !isParentMode && (
         <ChildSelector
           children={children}
@@ -59,6 +105,7 @@ const Index = () => {
         <ChildDashboard
           child={selectedChild}
           activities={activities}
+          completedActivities={completedActivities}
           onBack={handleBack}
           onCompleteActivity={handleCompleteActivity}
         />
@@ -68,7 +115,13 @@ const Index = () => {
         <ParentDashboard
           children={children}
           activities={activities}
+          completedActivities={completedActivities}
           onBack={handleBack}
+          onAddChild={addChild}
+          onRemoveChild={removeChild}
+          onAddActivity={addActivity}
+          onRemoveActivity={removeActivity}
+          onApproveActivity={approveActivity}
         />
       )}
     </Layout>
