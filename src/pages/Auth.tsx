@@ -41,8 +41,12 @@ const Auth = () => {
         } else {
           toast({
             title: "Cont creat cu succes!",
-            description: "Verifică-ți emailul pentru confirmarea contului.",
+            description: "ENJOY! Te poți autentifica acum.",
           });
+          setTimeout(() => {
+            setIsLogin(true);
+            navigate("/auth");
+          }, 1200);
         }
       }
     } catch (error) {
