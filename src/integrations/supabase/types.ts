@@ -147,6 +147,7 @@ export type Database = {
           id: string
           role: string | null
           updated_at: string | null
+          secret: string | null
         }
         Insert: {
           created_at?: string | null
@@ -155,6 +156,7 @@ export type Database = {
           id: string
           role?: string | null
           updated_at?: string | null
+          secret?: string | null
         }
         Update: {
           created_at?: string | null
@@ -163,6 +165,7 @@ export type Database = {
           id?: string
           role?: string | null
           updated_at?: string | null
+          secret?: string | null
         }
         Relationships: []
       }
@@ -193,7 +196,7 @@ export type Tables<
   }
     ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never,
 > = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
   ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {

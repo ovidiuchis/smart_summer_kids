@@ -1,15 +1,15 @@
-
-import React, { useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
-import { toast } from '@/hooks/use-toast';
-import Layout from '@/components/Layout';
+import React, { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
+import Layout from "@/components/Layout";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [secret, setSecret] = useState("");
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
@@ -28,10 +28,10 @@ const Auth = () => {
             variant: "destructive",
           });
         } else {
-          navigate('/');
+          navigate("/");
         }
       } else {
-        const { error } = await signUp(email, password, fullName);
+        const { error } = await signUp(email, password, fullName, secret);
         if (error) {
           toast({
             title: "Eroare la înregistrare",
@@ -65,14 +65,17 @@ const Auth = () => {
               🌟 Activități de Vară 🌟
             </h1>
             <p className="text-gray-600">
-              {isLogin ? 'Conectează-te la cont' : 'Creează un cont nou'}
+              {isLogin ? "Conectează-te la cont" : "Creează un cont nou"}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="fullName"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Nume complet
                 </label>
                 <input
@@ -87,7 +90,10 @@ const Auth = () => {
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Email
               </label>
               <input
@@ -101,8 +107,11 @@ const Auth = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Parolă
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Parolă acces aplicație
               </label>
               <input
                 type="password"
@@ -115,12 +124,35 @@ const Auth = () => {
               />
             </div>
 
+            {!isLogin && (
+              <div>
+                <label
+                  htmlFor="secret"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Cod acces părinte (secret)
+                </label>
+                <input
+                  type="password"
+                  id="secret"
+                  value={secret}
+                  onChange={(e) => setSecret(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  required
+                />
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loading}
               className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-xl transition-colors duration-200 disabled:opacity-50"
             >
-              {loading ? 'Se încarcă...' : (isLogin ? 'Conectează-te' : 'Creează cont')}
+              {loading
+                ? "Se încarcă..."
+                : isLogin
+                ? "Conectează-te"
+                : "Creează cont"}
             </button>
           </form>
 
@@ -129,10 +161,9 @@ const Auth = () => {
               onClick={() => setIsLogin(!isLogin)}
               className="text-blue-500 hover:text-blue-600 font-medium"
             >
-              {isLogin 
-                ? 'Nu ai cont? Creează unul aici' 
-                : 'Ai deja cont? Conectează-te aici'
-              }
+              {isLogin
+                ? "Nu ai cont? Creează unul aici"
+                : "Ai deja cont? Conectează-te aici"}
             </button>
           </div>
         </div>

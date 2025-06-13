@@ -6,6 +6,7 @@ import ChildDashboard from "../components/ChildDashboard";
 import ParentDashboard from "../components/ParentDashboard";
 import { useAuth } from "@/hooks/useAuth";
 import { useSupabaseData, Child } from "@/hooks/useSupabaseData";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -27,6 +28,12 @@ const Index = () => {
 
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
   const [isParentMode, setIsParentMode] = useState(false);
+  const [parentSecretPrompt, setParentSecretPrompt] = useState(false);
+  const [parentSecretInput, setParentSecretInput] = useState("");
+  const [parentSecretError, setParentSecretError] = useState("");
+  const [nukeSecretPrompt, setNukeSecretPrompt] = useState(false);
+  const [nukeSecretInput, setNukeSecretInput] = useState("");
+  const [nukeSecretError, setNukeSecretError] = useState("");
 
   if (authLoading) {
     return (
@@ -64,8 +71,30 @@ const Index = () => {
   };
 
   const handleParentMode = () => {
-    setIsParentMode(true);
+    setParentSecretPrompt(true);
     setSelectedChild(null);
+  };
+
+  const handleParentSecretSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setParentSecretError("");
+    // Fetch secret from user profile
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("secret")
+      .eq("id", user.id)
+      .single();
+    if (error || !data) {
+      setParentSecretError("Eroare la verificarea codului secret.");
+      return;
+    }
+    if (data.secret === parentSecretInput) {
+      setIsParentMode(true);
+      setParentSecretPrompt(false);
+      setParentSecretInput("");
+    } else {
+      setParentSecretError("Codul secret este incorect.");
+    }
   };
 
   const handleBack = () => {
@@ -81,6 +110,61 @@ const Index = () => {
 
   const handleSignOut = async () => {
     await signOut();
+  };
+
+  // NUKE account handler
+  const handleNukeAccount = async () => {
+    setNukeSecretPrompt(true);
+  };
+
+  const handleNukeSecretSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setNukeSecretError("");
+    if (!user) return;
+    // Fetch secret from user profile
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("secret")
+      .eq("id", user.id)
+      .single();
+    if (error || !data) {
+      setNukeSecretError("Eroare la verificarea codului secret.");
+      return;
+    }
+    if (data.secret === nukeSecretInput) {
+      // NUKE account logic
+      // Delete all completed activities for user's children
+      const { data: childrenData } = await supabase
+        .from("children")
+        .select("id")
+        .eq("parent_id", user.id);
+      const childIds = (childrenData || []).map((c: any) => c.id);
+      if (childIds.length > 0) {
+        await supabase
+          .from("completed_activities")
+          .delete()
+          .in("child_id", childIds);
+      }
+      // Delete all children
+      await supabase
+        .from("children")
+        .delete()
+        .eq("parent_id", user.id);
+      // Delete all activities
+      await supabase
+        .from("activities")
+        .delete()
+        .eq("parent_id", user.id);
+      // Delete profile
+      await supabase
+        .from("profiles")
+        .delete()
+        .eq("id", user.id);
+      await signOut();
+      window.location.reload();
+    } else {
+      setNukeSecretError("Codul secret este incorect.");
+    }
   };
 
   return (
@@ -129,7 +213,92 @@ const Index = () => {
           onSignOut={handleSignOut}
           onEditActivity={editActivity}
           onEditChild={editChild}
+          onNukeAccount={handleNukeAccount}
         />
+      )}
+
+      {parentSecretPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-xs">
+            <h2 className="text-xl font-bold mb-4">Acces părinte</h2>
+            <form onSubmit={handleParentSecretSubmit} className="space-y-4">
+              <input
+                type="password"
+                placeholder="Cod părinte"
+                value={parentSecretInput}
+                onChange={(e) => setParentSecretInput(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                required
+              />
+              {parentSecretError && (
+                <div className="text-red-600 text-sm">{parentSecretError}</div>
+              )}
+              <div className="flex gap-2 justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setParentSecretPrompt(false);
+                    setParentSecretInput("");
+                    setParentSecretError("");
+                  }}
+                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
+                >
+                  Anulează
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+                >
+                  Continuă
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {nukeSecretPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-xs">
+            <h2 className="text-xl font-bold mb-4">Confirmare ștergere cont</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Introdu codul secret pentru a confirma ștergerea contului tău și a
+              datelor asociate. Această acțiune este ireversibilă!
+            </p>
+            <form onSubmit={handleNukeSecretSubmit} className="space-y-4">
+              <input
+                type="password"
+                placeholder="Cod secret"
+                value={nukeSecretInput}
+                onChange={(e) => setNukeSecretInput(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                required
+              />
+              {nukeSecretError && (
+                <div className="text-red-600 text-sm">{nukeSecretError}</div>
+              )}
+              <div className="flex gap-2 justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNukeSecretPrompt(false);
+                    setNukeSecretInput("");
+                    setNukeSecretError("");
+                  }}
+                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
+                >
+                  Anulează
+                </button>
+                <button
+                  type="submit"
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+                >
+                  Șterge contul
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </Layout>
   );

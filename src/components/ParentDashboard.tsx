@@ -10,6 +10,7 @@ import {
   Camera,
   Pencil,
 } from "lucide-react";
+import exampleActivities from "../../activitati.json";
 
 interface ParentDashboardProps {
   children: Child[];
@@ -38,6 +39,7 @@ interface ParentDashboardProps {
     category: string;
   }) => void;
   onEditChild?: (child: { id: string; name: string; avatar: string }) => void;
+  onNukeAccount?: () => void;
 }
 
 const ParentDashboard: React.FC<ParentDashboardProps> = ({
@@ -54,6 +56,7 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
   onSignOut,
   onEditActivity,
   onEditChild,
+  onNukeAccount,
 }) => {
   const [showAddChild, setShowAddChild] = useState(false);
   const [showAddActivity, setShowAddActivity] = useState(false);
@@ -79,6 +82,7 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
     name: string;
     avatar: string;
   }>(null);
+  const [showPopulateExamples, setShowPopulateExamples] = useState(false);
 
   const totalPointsEarned = children.reduce(
     (sum, child) => sum + child.total_points,
@@ -154,6 +158,20 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
     }
   };
 
+  const handlePopulateExamples = async () => {
+    setShowPopulateExamples(true);
+    for (const act of (exampleActivities as any[]).slice(0, 10)) {
+      await onAddActivity({
+        name: act.nume,
+        description: act.descriere,
+        emoji: act.emoji,
+        points: act.puncte,
+        category: act.categorie?.toLowerCase() || "general",
+      });
+    }
+    setShowPopulateExamples(false);
+  };
+
   return (
     <div className="animate-fade-in">
       <Header
@@ -161,14 +179,6 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
         subtitle="Gestionează copiii și activitățile"
         rightElement={
           <div className="flex items-center gap-2">
-            {onSignOut && (
-              <button
-                onClick={onSignOut}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
-              >
-                Deconectează-te
-              </button>
-            )}
             <button
               onClick={onBack}
               className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200"
@@ -221,9 +231,19 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
       {/* Pending Approvals */}
       {pendingApprovals.length > 0 && (
         <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200 mb-8">
-          <h2 className="text-xl font-bold text-gray-800 mb-6">
-            Activități în așteptarea aprobării
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-gray-800">
+              Activități în așteptarea aprobării
+            </h2>
+            <button
+              onClick={() => {
+                pendingApprovals.forEach((ca) => onApproveActivity(ca.id));
+              }}
+              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+            >
+              Aprobă toate
+            </button>
+          </div>
           <div className="space-y-4">
             {pendingApprovals.map((ca) => (
               <div
@@ -530,6 +550,21 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
           </div>
         )}
 
+        {/* Show populate example activities option - vizibil doar dacă nu există activități */}
+        {activities.length === 0 && (
+          <div className="flex justify-center mt-2 mb-6">
+            <button
+              onClick={handlePopulateExamples}
+              disabled={showPopulateExamples}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 shadow disabled:opacity-60"
+            >
+              {showPopulateExamples
+                ? "Se populează..."
+                : "Populează cu 10 activități exemplu"}
+            </button>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {activities.map((activity) => (
             <div
@@ -700,7 +735,39 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                     </option>
                   ))}
                 </select>
+                <span className="text-sm text-gray-500">sau</span>
+                <label className="cursor-pointer bg-gray-200 hover:bg-gray-300 p-2 rounded-lg transition-colors">
+                  <Camera size={16} />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                          const result = ev.target?.result as string;
+                          setEditChild((editChild) =>
+                            editChild ? { ...editChild, avatar: result } : null
+                          );
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="hidden"
+                  />
+                </label>
               </div>
+              {editChild.avatar &&
+                !avatarOptions.includes(editChild.avatar) && (
+                  <div className="mt-2">
+                    <img
+                      src={editChild.avatar}
+                      alt="Preview"
+                      className="w-12 h-12 rounded-full object-cover border-2 border-gray-300"
+                    />
+                  </div>
+                )}
             </div>
             <div className="flex gap-2 mt-6 justify-end">
               <button
@@ -720,6 +787,28 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Action buttons at the end of the page, not floating */}
+      {(onSignOut || onNukeAccount) && (
+        <div className="flex flex-row gap-3 items-center justify-center mt-12 mb-6 w-full">
+          {onSignOut && (
+            <button
+              onClick={onSignOut}
+              className="bg-red-500 hover:bg-red-600 text-white px-8 py-2 rounded-lg font-medium shadow-lg transition-colors duration-200 min-w-[180px] text-center"
+            >
+              Deconectează-te
+            </button>
+          )}
+          {onNukeAccount && (
+            <button
+              onClick={onNukeAccount}
+              className="bg-black hover:bg-red-700 text-white px-8 py-2 rounded-lg font-medium shadow-lg transition-colors duration-200 min-w-[200px] text-center"
+            >
+              🧨 Șterge tot contul
+            </button>
+          )}
         </div>
       )}
     </div>

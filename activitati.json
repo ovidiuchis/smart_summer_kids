@@ -1,0 +1,72 @@
+[
+  {
+    "nume": "Citit carte nouă",
+    "descriere": "Citește cel puțin 20 de minute dintr-o carte",
+    "puncte": 10,
+    "emoji": "📚",
+    "categorie": "Citire"
+  },
+  {
+    "nume": "Ordine în cameră",
+    "descriere": "Aranjează jucăriile și patul",
+    "puncte": 8,
+    "emoji": "🛏️",
+    "categorie": "Curățenie"
+  },
+  {
+    "nume": "Spălat vase",
+    "descriere": "Ajută la spălatul vaselor după masă",
+    "puncte": 12,
+    "emoji": "🧽",
+    "categorie": "Ajutor"
+  },
+  {
+    "nume": "20 de flotări",
+    "descriere": "Fă 20 de flotări pentru mișcare",
+    "puncte": 10,
+    "emoji": "🏋️‍♂️",
+    "categorie": "Exerciții"
+  },
+  {
+    "nume": "Exercițiu matematică",
+    "descriere": "Rezolvă 5 exerciții de matematică",
+    "puncte": 10,
+    "emoji": "🔢",
+    "categorie": "Învățare"
+  },
+  {
+    "nume": "Pregătit micul dejun",
+    "descriere": "Pregătește micul dejun pentru toată familia",
+    "puncte": 15,
+    "emoji": "👨‍🍳",
+    "categorie": "Ajutor"
+  },
+  {
+    "nume": "Desen liber",
+    "descriere": "Desenează o imagine din imaginația ta",
+    "puncte": 8,
+    "emoji": "🎨",
+    "categorie": "Învățare"
+  },
+  {
+    "nume": "Exercițiu muzical",
+    "descriere": "Cântă 10 minute la pian sau alt instrument",
+    "puncte": 10,
+    "emoji": "🎵",
+    "categorie": "Învățare"
+  },
+  {
+    "nume": "Udat florile",
+    "descriere": "Udă florile de pe balcon sau grădină",
+    "puncte": 7,
+    "emoji": "🌱",
+    "categorie": "Ajutor"
+  },
+  {
+    "nume": "Joacă cu frățiorii",
+    "descriere": "Joacă-te 30 min cu frații fără ceartă :)",
+    "puncte": 10,
+    "emoji": "🐒",
+    "categorie": "General"
+  }
+]
