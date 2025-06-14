@@ -46,10 +46,12 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({
                     <img
                       src={child.avatar}
                       alt={child.name}
-                      className="w-16 h-16 rounded-full object-cover border-2 border-gray-300 mx-auto"
+                      className="w-28 h-28 rounded-full object-cover border-4 border-blue-300 mx-auto shadow-lg"
                     />
                   ) : (
-                    <span className="text-6xl">{child.avatar}</span>
+                    <span className="text-8xl block leading-none drop-shadow-md">
+                      {child.avatar}
+                    </span>
                   )}
                 </div>
                 <h3 className="text-2xl font-bold text-gray-800 mb-2">
