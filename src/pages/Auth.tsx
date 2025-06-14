@@ -60,9 +60,49 @@ const Auth = () => {
     }
   };
 
+  // Demo login handler
+  const handleDemoLogin = async () => {
+    setLoading(true);
+    setEmail("demo@super.vara");
+    setPassword("supervara");
+    try {
+      const { error } = await signIn("demo@super.vara", "supervara");
+      if (error) {
+        toast({
+          title: "Eroare la autentificare demo",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        navigate("/");
+      }
+    } catch (error) {
+      toast({
+        title: "A apărut o eroare demo",
+        description: "Te rugăm să încerci din nou.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Layout>
-      <div className="min-h-[80vh] flex items-center justify-center">
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="mb-2 text-center text-gray-700 text-base">
+          Dacă vrei să încerci aplicația rapid, folosește contul demo de mai jos.
+          <br />
+          <b>ATENȚIE:</b> Pentru acces părinte sau funcții speciale, secretul este{" "}
+          <b>supervara</b>.
+        </div>
+        <button
+          onClick={handleDemoLogin}
+          className="mb-6 bg-yellow-400 hover:bg-yellow-500 text-black font-bold px-6 py-3 rounded-lg shadow-lg transition-colors duration-200"
+          disabled={loading}
+        >
+          CONT DEMO (demo@super.vara / supervara)
+        </button>
         <div className="bg-white rounded-2xl p-8 shadow-lg max-w-md w-full">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-2 whitespace-nowrap ">

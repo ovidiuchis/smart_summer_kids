@@ -42,15 +42,15 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({
                 className="bg-white rounded-2xl p-8 shadow-lg hover-lift cursor-pointer border-4 border-transparent hover:border-blue-300 transition-all duration-300"
               >
                 <div className="mb-4">
-                  {child.avatar && child.avatar.startsWith("data:image") ? (
+                  {child.avatar_url ? (
                     <img
-                      src={child.avatar}
+                      src={child.avatar_url}
                       alt={child.name}
                       className="w-36 h-36 rounded-full object-cover border-4 border-blue-300 mx-auto shadow-lg"
                     />
                   ) : (
                     <span className="text-9xl block leading-none drop-shadow-md">
-                      {child.avatar}
+                      {child.name[0]}
                     </span>
                   )}
                 </div>

@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { compressImage } from "@/lib/imageCompression";
 
 export interface Child {
   id: string;
   parent_id: string;
   name: string;
-  avatar: string;
+  avatar_url: string | null;
   total_points: number;
   created_at: string;
   updated_at: string;
@@ -105,9 +106,38 @@ export const useSupabaseData = () => {
     fetchData();
   }, [user]);
 
-  const addChild = async (name: string, avatar: string) => {
-    if (!user) return;
+  // Helper to upload avatar image to Supabase Storage
+  const uploadAvatarImage = async (file: File, fileName: string) => {
+    const fileExt = file.name.split(".").pop();
+    const filePath = `${fileName}.${fileExt}`;
+    const { data, error } = await supabase.storage
+      .from("avatars")
+      .upload(filePath, file, { upsert: true });
+    if (error) throw error;
+    const { data: publicUrlData } = supabase.storage
+      .from("avatars")
+      .getPublicUrl(filePath);
+    return { publicUrl: publicUrlData.publicUrl, filePath };
+  };
 
+  const addChild = async (name: string, avatar: string | File) => {
+    if (!user) return;
+    let avatar_url: string | null = null;
+    let tempFilePath: string | null = null;
+    if (typeof avatar === "string" && avatar.startsWith("data:image")) {
+      const res = await fetch(avatar);
+      const blob = await res.blob();
+      const file = new File([blob], `${name}_avatar.png`, { type: blob.type });
+      const tempId = crypto.randomUUID();
+      const uploadRes = await uploadAvatarImage(file, tempId);
+      avatar_url = uploadRes.publicUrl;
+      tempFilePath = uploadRes.filePath;
+    } else if (avatar instanceof File) {
+      const tempId = crypto.randomUUID();
+      const uploadRes = await uploadAvatarImage(avatar, tempId);
+      avatar_url = uploadRes.publicUrl;
+      tempFilePath = uploadRes.filePath;
+    }
     try {
       const { data, error } = await supabase
         .from("children")
@@ -115,14 +145,28 @@ export const useSupabaseData = () => {
           {
             parent_id: user.id,
             name,
-            avatar,
+            avatar_url,
             total_points: 0,
           },
         ])
         .select()
         .single();
-
       if (error) throw error;
+      // If we uploaded with a tempId, update to use the real id
+      if (avatar_url && data && data.id && tempFilePath) {
+        const ext = tempFilePath.split(".").pop();
+        const oldPath = tempFilePath;
+        const newPath = `${data.id}.${ext}`;
+        await supabase.storage.from("avatars").move(oldPath, newPath);
+        const { data: publicUrlData } = supabase.storage
+          .from("avatars")
+          .getPublicUrl(newPath);
+        await supabase
+          .from("children")
+          .update({ avatar_url: publicUrlData.publicUrl })
+          .eq("id", data.id);
+        data.avatar_url = publicUrlData.publicUrl;
+      }
       setChildren((prev) => [...prev, data]);
       return data;
     } catch (error) {
@@ -317,20 +361,65 @@ export const useSupabaseData = () => {
   const editChild = async (childData: {
     id: string;
     name: string;
-    avatar: string;
+    avatar: string | File;
+    currentAvatarUrl?: string | null;
   }) => {
+    let avatar_url: string | undefined = undefined;
+    let isAvatarChanged = false;
+    let tempFilePath: string | null = null;
+    if (typeof childData.avatar === "string") {
+      if (childData.avatar.startsWith("data:image")) {
+        // New image selected (base64)
+        const res = await fetch(childData.avatar);
+        const blob = await res.blob();
+        let file = new File([blob], `${childData.name}_avatar.png`, {
+          type: blob.type,
+        });
+        file = await compressImage(file, 1, 512);
+        const uploadRes = await uploadAvatarImage(file, childData.id);
+        avatar_url = uploadRes.publicUrl;
+        tempFilePath = uploadRes.filePath;
+        isAvatarChanged = true;
+      }
+    } else if (childData.avatar instanceof File) {
+      // New image selected (File)
+      const compressed = await compressImage(childData.avatar, 1, 512);
+      const uploadRes = await uploadAvatarImage(compressed, childData.id);
+      avatar_url = uploadRes.publicUrl;
+      tempFilePath = uploadRes.filePath;
+      isAvatarChanged = true;
+    }
+    // If not changed, do not include avatar_url in update
+    const updateObj: any = {
+      name: childData.name,
+      updated_at: new Date().toISOString(),
+    };
+    if (isAvatarChanged) {
+      updateObj.avatar_url = avatar_url;
+    }
     try {
       const { data, error } = await supabase
         .from("children")
-        .update({
-          name: childData.name,
-          avatar: childData.avatar,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateObj)
         .eq("id", childData.id)
         .select()
         .single();
       if (error) throw error;
+      // If we uploaded with a temp path, move to correct id-based filename
+      if (isAvatarChanged && avatar_url && tempFilePath) {
+        const ext = tempFilePath.split(".").pop();
+        const oldPath = tempFilePath;
+        const newPath = `${childData.id}.${ext}`;
+        await supabase.storage.from("avatars").move(oldPath, newPath);
+        const { data: publicUrlData } = supabase.storage
+          .from("avatars")
+          .getPublicUrl(newPath);
+        await supabase
+          .from("children")
+          .update({ avatar_url: publicUrlData.publicUrl })
+          .eq("id", childData.id);
+        data.avatar_url = publicUrlData.publicUrl;
+      }
       setChildren((prev) => prev.map((c) => (c.id === data.id ? data : c)));
       return data;
     } catch (error) {

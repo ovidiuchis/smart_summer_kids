@@ -35,7 +35,40 @@ const Index = () => {
   const [nukeSecretInput, setNukeSecretInput] = useState("");
   const [nukeSecretError, setNukeSecretError] = useState("");
 
+  const sessionStart = React.useRef(performance.now());
+
+  // Timeout fallback: always at top level, never after a return!
+  useEffect(() => {
+    if (!loading && !authLoading && !user) return; // already handled
+    const timeout = setTimeout(() => {
+      if (loading || authLoading) {
+        if (typeof window !== "undefined") {
+          localStorage.clear();
+          sessionStorage.clear();
+        }
+        if (signOut) signOut();
+        window.location.href = "/auth";
+      }
+    }, 10000); // 10 seconds
+    return () => clearTimeout(timeout);
+  }, [loading, authLoading, user, signOut]);
+
+  // Log when everything is ready
+  useEffect(() => {
+    if (!loading && !authLoading && user) {
+      const t = performance.now() - sessionStart.current;
+      console.log(
+        `[TIMING] ChildSelector/ParentDashboard rendered after ${(
+          t / 1000
+        ).toFixed(2)}s`
+      );
+    }
+  }, [loading, authLoading, user]);
+
   if (authLoading) {
+    console.log(
+      "[TIMING] authLoading=true, waiting for session restoration..."
+    );
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -49,10 +82,20 @@ const Index = () => {
   }
 
   if (!user) {
+    const t = performance.now() - sessionStart.current;
+    console.log(
+      `[TIMING] No user after ${(t / 1000).toFixed(2)}s, redirecting to /auth`
+    );
     return <Navigate to="/auth" replace />;
   }
 
   if (loading) {
+    const t = performance.now() - sessionStart.current;
+    console.log(
+      `[TIMING] Data loading for user ${user.id} after ${(t / 1000).toFixed(
+        2
+      )}s...`
+    );
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -146,20 +189,11 @@ const Index = () => {
           .in("child_id", childIds);
       }
       // Delete all children
-      await supabase
-        .from("children")
-        .delete()
-        .eq("parent_id", user.id);
+      await supabase.from("children").delete().eq("parent_id", user.id);
       // Delete all activities
-      await supabase
-        .from("activities")
-        .delete()
-        .eq("parent_id", user.id);
+      await supabase.from("activities").delete().eq("parent_id", user.id);
       // Delete profile
-      await supabase
-        .from("profiles")
-        .delete()
-        .eq("id", user.id);
+      await supabase.from("profiles").delete().eq("id", user.id);
       await signOut();
       window.location.reload();
     } else {
@@ -167,21 +201,18 @@ const Index = () => {
     }
   };
 
-  // Timeout fallback: if loading takes too long, force logout and redirect
-  useEffect(() => {
-    if (!loading && !authLoading && !user) return; // already handled
-    const timeout = setTimeout(() => {
-      if (loading || authLoading) {
-        if (typeof window !== "undefined") {
-          localStorage.clear();
-          sessionStorage.clear();
-        }
-        if (signOut) signOut();
-        window.location.href = "/auth";
-      }
-    }, 12000); // 12 seconds
-    return () => clearTimeout(timeout);
-  }, [loading, authLoading, user, signOut]);
+  // Handler to map avatar_url to avatar for editChild
+  const handleEditChild = (child: {
+    id: string;
+    name: string;
+    avatar_url: string | null;
+  }) => {
+    editChild({
+      id: child.id,
+      name: child.name,
+      avatar: child.avatar_url ?? "",
+    });
+  };
 
   return (
     <Layout>
@@ -228,7 +259,7 @@ const Index = () => {
           onPayoutPoints={payoutPoints}
           onSignOut={handleSignOut}
           onEditActivity={editActivity}
-          onEditChild={editChild}
+          onEditChild={handleEditChild}
           onNukeAccount={handleNukeAccount}
         />
       )}

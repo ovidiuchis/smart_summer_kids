@@ -64,14 +64,14 @@ const ChildDashboard: React.FC<ChildDashboardProps> = ({
       <Header
         title={
           <span className="flex items-center gap-2">
-            {child.avatar && child.avatar.startsWith("data:image") ? (
+            {child.avatar_url ? (
               <img
-                src={child.avatar}
+                src={child.avatar_url}
                 alt={child.name}
                 className="w-8 h-8 rounded-full object-cover border-2 border-gray-300"
               />
             ) : (
-              <span className="text-2xl">{child.avatar}</span>
+              <span className="text-2xl">{child.name[0]}</span>
             )}
             <span>Salut {child.name}!</span>
           </span>

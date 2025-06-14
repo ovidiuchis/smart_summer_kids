@@ -11,6 +11,7 @@ import {
   Pencil,
 } from "lucide-react";
 import exampleActivities from "../../activitati.json";
+import { compressImage } from "@/lib/imageCompression";
 
 interface ParentDashboardProps {
   children: Child[];
@@ -38,7 +39,11 @@ interface ParentDashboardProps {
     points: number;
     category: string;
   }) => void;
-  onEditChild?: (child: { id: string; name: string; avatar: string }) => void;
+  onEditChild?: (child: {
+    id: string;
+    name: string;
+    avatar_url: string | null;
+  }) => void;
   onNukeAccount?: () => void;
 }
 
@@ -61,7 +66,7 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
   const [showAddChild, setShowAddChild] = useState(false);
   const [showAddActivity, setShowAddActivity] = useState(false);
   const [newChildName, setNewChildName] = useState("");
-  const [newChildAvatar, setNewChildAvatar] = useState("👧");
+  const [newChildAvatar, setNewChildAvatar] = useState<string | null>(null);
   const [newActivity, setNewActivity] = useState({
     name: "",
     description: "",
@@ -80,7 +85,7 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
   const [editChild, setEditChild] = useState<null | {
     id: string;
     name: string;
-    avatar: string;
+    avatar_url: string | null;
   }>(null);
   const [showPopulateExamples, setShowPopulateExamples] = useState(false);
 
@@ -93,7 +98,6 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
     (ca) => !ca.approved_by_parent
   );
 
-  const avatarOptions = ["👧", "👦", "🧒", "👶", "🦸", "🦸‍♀️", "🧚", "🧚‍♂️"];
   const emojiOptions = [
     "⭐",
     "📚",
@@ -119,9 +123,9 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
 
   const handleAddChild = () => {
     if (newChildName.trim()) {
-      onAddChild(newChildName.trim(), newChildAvatar);
+      onAddChild(newChildName.trim(), newChildAvatar || "");
       setNewChildName("");
-      setNewChildAvatar("👧");
+      setNewChildAvatar(null);
       setShowAddChild(false);
     }
   };
@@ -146,15 +150,20 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
     }
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setNewChildAvatar(result);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressImage(file, 1, 512);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = e.target?.result as string;
+          setNewChildAvatar(result);
+        };
+        reader.readAsDataURL(compressed);
+      } catch (err) {
+        alert("Imaginea este prea mare sau nu a putut fi procesată.");
+      }
     }
   };
 
@@ -312,22 +321,6 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                   Avatar
                 </label>
                 <div className="flex items-center space-x-2">
-                  <select
-                    value={
-                      avatarOptions.includes(newChildAvatar)
-                        ? newChildAvatar
-                        : ""
-                    }
-                    onChange={(e) => setNewChildAvatar(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    {avatarOptions.map((avatar) => (
-                      <option key={avatar} value={avatar}>
-                        {avatar}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="text-sm text-gray-500">sau</div>
                   <label className="cursor-pointer bg-gray-200 hover:bg-gray-300 p-2 rounded-lg transition-colors">
                     <Camera size={16} />
                     <input
@@ -338,7 +331,7 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                     />
                   </label>
                 </div>
-                {newChildAvatar && !avatarOptions.includes(newChildAvatar) && (
+                {newChildAvatar && (
                   <div className="mt-2">
                     <img
                       src={newChildAvatar}
@@ -374,16 +367,14 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
             >
               <div className="flex items-center space-x-4">
                 <div className="text-2xl">
-                  {avatarOptions.includes(child.avatar) ? (
-                    child.avatar
-                  ) : child.avatar && child.avatar.startsWith("data:image") ? (
+                  {child.avatar_url ? (
                     <img
-                      src={child.avatar}
+                      src={child.avatar_url}
                       alt={child.name}
                       className="w-10 h-10 rounded-full object-cover border-2 border-gray-300"
                     />
                   ) : (
-                    <span className="text-xs text-gray-400">No avatar</span>
+                    <span className="text-2xl">{child.name[0]}</span>
                   )}
                 </div>
                 <div>
@@ -419,7 +410,13 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                   <Trash2 size={16} />
                 </button>
                 <button
-                  onClick={() => setEditChild({ ...child })}
+                  onClick={() =>
+                    setEditChild({
+                      id: child.id,
+                      name: child.name,
+                      avatar_url: child.avatar_url,
+                    })
+                  }
                   className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded transition-colors ml-1"
                 >
                   <Pencil size={16} />
@@ -722,52 +719,44 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
               />
               <div className="flex gap-2 items-center">
                 <label className="font-medium">Avatar:</label>
-                <select
-                  className="border border-gray-300 rounded-lg px-2 py-1"
-                  value={editChild.avatar}
-                  onChange={(e) =>
-                    setEditChild({ ...editChild, avatar: e.target.value })
-                  }
-                >
-                  {avatarOptions.map((avatar) => (
-                    <option key={avatar} value={avatar}>
-                      {avatar}
-                    </option>
-                  ))}
-                </select>
-                <span className="text-sm text-gray-500">sau</span>
                 <label className="cursor-pointer bg-gray-200 hover:bg-gray-300 p-2 rounded-lg transition-colors">
                   <Camera size={16} />
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (ev) => {
-                          const result = ev.target?.result as string;
-                          setEditChild((editChild) =>
-                            editChild ? { ...editChild, avatar: result } : null
-                          );
-                        };
-                        reader.readAsDataURL(file);
+                        try {
+                          const compressed = await compressImage(file, 1, 512);
+                          const reader = new FileReader();
+                          reader.onload = (ev) => {
+                            const result = ev.target?.result as string;
+                            setEditChild((editChild) =>
+                              editChild
+                                ? { ...editChild, avatar_url: result }
+                                : null
+                            );
+                          };
+                          reader.readAsDataURL(compressed);
+                        } catch (err) {
+                          alert("Imaginea este prea mare sau nu a putut fi procesată.");
+                        }
                       }
                     }}
                     className="hidden"
                   />
                 </label>
               </div>
-              {editChild.avatar &&
-                !avatarOptions.includes(editChild.avatar) && (
-                  <div className="mt-2">
-                    <img
-                      src={editChild.avatar}
-                      alt="Preview"
-                      className="w-12 h-12 rounded-full object-cover border-2 border-gray-300"
-                    />
-                  </div>
-                )}
+              {editChild.avatar_url && (
+                <div className="mt-2">
+                  <img
+                    src={editChild.avatar_url}
+                    alt="Preview"
+                    className="w-12 h-12 rounded-full object-cover border-2 border-gray-300"
+                  />
+                </div>
+              )}
             </div>
             <div className="flex gap-2 mt-6 justify-end">
               <button
