@@ -91,10 +91,11 @@ const Auth = () => {
     <Layout>
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="mb-2 text-center text-gray-700 text-base">
-          Dacă vrei să încerci aplicația rapid, folosește contul demo de mai jos.
+          Dacă vrei să încerci aplicația rapid, folosește contul demo de mai
+          jos.
           <br />
-          <b>ATENȚIE:</b> Pentru acces părinte sau funcții speciale, secretul este{" "}
-          <b>supervara</b>.
+          <b>ATENȚIE:</b> Pentru acces părinte sau funcții speciale, secretul
+          este <b>supervara</b>.
         </div>
         <button
           onClick={handleDemoLogin}
@@ -120,15 +121,17 @@ const Auth = () => {
                   htmlFor="fullName"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Nume complet
+                  Familia
                 </label>
                 <input
-                  type="text"
                   id="fullName"
+                  type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required={!isLogin}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Familia Popescu"
+                  autoComplete="family-name"
+                  required
                 />
               </div>
             )}

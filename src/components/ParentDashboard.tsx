@@ -45,6 +45,7 @@ interface ParentDashboardProps {
     avatar_url: string | null;
   }) => void;
   onNukeAccount?: () => void;
+  familyName?: string;
 }
 
 const ParentDashboard: React.FC<ParentDashboardProps> = ({
@@ -62,6 +63,7 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
   onEditActivity,
   onEditChild,
   onNukeAccount,
+  familyName,
 }) => {
   const [showAddChild, setShowAddChild] = useState(false);
   const [showAddActivity, setShowAddActivity] = useState(false);
@@ -150,7 +152,9 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
     }
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
       try {
@@ -184,7 +188,7 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
   return (
     <div className="animate-fade-in">
       <Header
-        title="👨‍👩‍👧‍👦 Panou Administrator"
+        title="👨‍👩‍👧‍👦 Panou părinte"
         subtitle="Gestionează copiii și activitățile"
         rightElement={
           <div className="flex items-center gap-2">
@@ -196,6 +200,7 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
             </button>
           </div>
         }
+        familyName={familyName}
       />
 
       {/* Overview Stats */}
@@ -740,7 +745,9 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                           };
                           reader.readAsDataURL(compressed);
                         } catch (err) {
-                          alert("Imaginea este prea mare sau nu a putut fi procesată.");
+                          alert(
+                            "Imaginea este prea mare sau nu a putut fi procesată."
+                          );
                         }
                       }
                     }}

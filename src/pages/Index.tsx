@@ -34,6 +34,7 @@ const Index = () => {
   const [nukeSecretPrompt, setNukeSecretPrompt] = useState(false);
   const [nukeSecretInput, setNukeSecretInput] = useState("");
   const [nukeSecretError, setNukeSecretError] = useState("");
+  const [familyName, setFamilyName] = useState<string>("");
 
   const sessionStart = React.useRef(performance.now());
 
@@ -64,6 +65,23 @@ const Index = () => {
       );
     }
   }, [loading, authLoading, user]);
+
+  // Fetch family name after login
+  useEffect(() => {
+    const fetchFamilyName = async () => {
+      if (user) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", user.id)
+          .single();
+        if (!error && data && data.full_name) {
+          setFamilyName(data.full_name);
+        }
+      }
+    };
+    fetchFamilyName();
+  }, [user]);
 
   if (authLoading) {
     console.log(
@@ -232,6 +250,7 @@ const Index = () => {
           completedActivities={completedActivities}
           onChildSelect={handleChildSelect}
           onParentMode={handleParentMode}
+          familyName={familyName}
         />
       )}
 
@@ -261,6 +280,7 @@ const Index = () => {
           onEditActivity={editActivity}
           onEditChild={handleEditChild}
           onNukeAccount={handleNukeAccount}
+          familyName={familyName}
         />
       )}
 

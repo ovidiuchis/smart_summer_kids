@@ -6,6 +6,7 @@ interface ChildSelectorProps {
   completedActivities: CompletedActivity[];
   onChildSelect: (child: Child) => void;
   onParentMode: () => void;
+  familyName?: string;
 }
 
 const ChildSelector: React.FC<ChildSelectorProps> = ({
@@ -13,6 +14,7 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({
   completedActivities,
   onChildSelect,
   onParentMode,
+  familyName,
 }) => {
   const getTotalPointsEarned = (childId: string) => {
     return completedActivities
@@ -26,6 +28,11 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({
         <h1 className="text-5xl font-bold text-gray-800 mb-4">
           🌟 Tracker Activități de Vară 🌟
         </h1>
+        {familyName && (
+          <div className="text-2xl font-semibold text-blue-700 mb-2">
+            👨‍👩‍👧‍👦 Familia {familyName}
+          </div>
+        )}
         <p className="text-xl text-gray-600">
           Alege numele tău pentru a colecta puncte în această Super Vară!
         </p>
