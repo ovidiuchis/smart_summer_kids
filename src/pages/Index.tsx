@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import ChildSelector from "../components/ChildSelector";
@@ -166,6 +166,22 @@ const Index = () => {
       setNukeSecretError("Codul secret este incorect.");
     }
   };
+
+  // Timeout fallback: if loading takes too long, force logout and redirect
+  useEffect(() => {
+    if (!loading && !authLoading && !user) return; // already handled
+    const timeout = setTimeout(() => {
+      if (loading || authLoading) {
+        if (typeof window !== "undefined") {
+          localStorage.clear();
+          sessionStorage.clear();
+        }
+        if (signOut) signOut();
+        window.location.href = "/auth";
+      }
+    }, 12000); // 12 seconds
+    return () => clearTimeout(timeout);
+  }, [loading, authLoading, user, signOut]);
 
   return (
     <Layout>
