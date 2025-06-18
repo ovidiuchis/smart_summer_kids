@@ -10,6 +10,8 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [secret, setSecret] = useState("");
+  const [confirmEmail, setConfirmEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
@@ -17,7 +19,7 @@ const Auth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
+    setEmailError("");
     try {
       if (isLogin) {
         const { error } = await signIn(email, password);
@@ -31,6 +33,11 @@ const Auth = () => {
           navigate("/");
         }
       } else {
+        if (email !== confirmEmail) {
+          setEmailError("Adresele de email nu coincid.");
+          setLoading(false);
+          return;
+        }
         const { error } = await signUp(email, password, fullName, secret);
         if (error) {
           toast({
@@ -135,7 +142,6 @@ const Auth = () => {
                 />
               </div>
             )}
-
             <div>
               <label
                 htmlFor="email"
@@ -152,6 +158,27 @@ const Auth = () => {
                 required
               />
             </div>
+            {!isLogin && (
+              <div>
+                <label
+                  htmlFor="confirmEmail"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Confirmă emailul
+                </label>
+                <input
+                  type="email"
+                  id="confirmEmail"
+                  value={confirmEmail}
+                  onChange={(e) => setConfirmEmail(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+                {emailError && (
+                  <div className="text-red-600 text-sm mt-1">{emailError}</div>
+                )}
+              </div>
+            )}
 
             <div>
               <label
