@@ -428,6 +428,22 @@ export const useSupabaseData = () => {
     }
   };
 
+  const discardActivity = async (completedActivityId: string) => {
+    try {
+      const { error } = await supabase
+        .from("completed_activities")
+        .delete()
+        .eq("id", completedActivityId);
+      if (error) throw error;
+      setCompletedActivities((prev) =>
+        prev.filter((ca) => ca.id !== completedActivityId)
+      );
+    } catch (error) {
+      console.error("Error discarding activity:", error);
+      throw error;
+    }
+  };
+
   return {
     loading,
     children,
@@ -442,6 +458,7 @@ export const useSupabaseData = () => {
     payoutPoints,
     editActivity,
     editChild,
+    discardActivity,
     refetch: fetchData,
   };
 };

@@ -46,6 +46,7 @@ interface ParentDashboardProps {
   }) => void;
   onNukeAccount?: () => void;
   familyName?: string;
+  discardActivity: (completedActivityId: string) => Promise<void>;
 }
 
 const ParentDashboard: React.FC<ParentDashboardProps> = ({
@@ -64,6 +65,7 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
   onEditChild,
   onNukeAccount,
   familyName,
+  discardActivity,
 }) => {
   const [showAddChild, setShowAddChild] = useState(false);
   const [showAddActivity, setShowAddActivity] = useState(false);
@@ -285,6 +287,13 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                     className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg transition-colors duration-200"
                   >
                     <Check size={16} />
+                  </button>
+                  <button
+                    onClick={() => discardActivity(ca.id)}
+                    className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors duration-200 ml-2"
+                    title="Renunță la activitate"
+                  >
+                    <Trash2 size={16} />
                   </button>
                 </div>
               </div>

@@ -24,6 +24,7 @@ const Index = () => {
     payoutPoints,
     editActivity,
     editChild,
+    discardActivity,
   } = useSupabaseData();
 
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
@@ -281,6 +282,7 @@ const Index = () => {
           onEditChild={handleEditChild}
           onNukeAccount={handleNukeAccount}
           familyName={familyName}
+          discardActivity={discardActivity}
         />
       )}
 
