@@ -204,7 +204,6 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
         }
         familyName={familyName}
       />
-
       {/* Overview Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
@@ -243,7 +242,6 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
           <div className="text-gray-600 text-center text-sm">În așteptare</div>
         </div>
       </div>
-
       {/* Pending Approvals */}
       {pendingApprovals.length > 0 && (
         <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200 mb-8">
@@ -301,7 +299,6 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
           </div>
         </div>
       )}
-
       {/* Children Management */}
       <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200 mb-8">
         <div className="flex items-center justify-between mb-6">
@@ -440,7 +437,6 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
           ))}
         </div>
       </div>
-
       {/* Activities Management */}
       <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
         <div className="flex items-center justify-between mb-6">
@@ -617,7 +613,6 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
           ))}
         </div>
       </div>
-
       {/* Edit Activity Modal */}
       {editActivity && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
@@ -715,7 +710,6 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
           </div>
         </div>
       )}
-
       {/* Edit Child Modal */}
       {editChild && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
@@ -794,7 +788,6 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
           </div>
         </div>
       )}
-
       {/* Action buttons at the end of the page, not floating */}
       {(onSignOut || onNukeAccount) && (
         <div className="flex flex-row gap-3 items-center justify-center mt-12 mb-6 w-full">
@@ -815,7 +808,17 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
             </button>
           )}
         </div>
-      )}
+      )}{" "}
+      <div className="text-center text-xs mt-8">
+        <a
+          href="https://ovidiuchis.github.io"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#eec213] hover:text-amber-500 transition-colors"
+        >
+          by O
+        </a>
+      </div>
     </div>
   );
 };

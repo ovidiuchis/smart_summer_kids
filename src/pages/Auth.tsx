@@ -241,7 +241,17 @@ const Auth = () => {
             </button>
           </div>
         </div>
-      </div>
+        <div className="text-center text-xs mt-4">
+          <a
+            href="https://ovidiuchis.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#eec213] hover:text-amber-500 transition-colors"
+          >
+            by O
+          </a>
+        </div>
+      </div>{" "}
     </Layout>
   );
 };
