@@ -5,10 +5,16 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
+import { useFeatureHighlight } from "@/hooks/useFeatureHighlight";
 
 export default function Admin() {
   const { user, loading: authLoading } = useAuth();
-  const { deleteAccount, updateAccountName, updateParentSecret, getParentSecret } = useSupabaseData();
+  const {
+    deleteAccount,
+    updateAccountName,
+    updateParentSecret,
+    getParentSecret,
+  } = useSupabaseData();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -44,9 +50,14 @@ export default function Admin() {
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
+  const { markFeatureSeen } = useFeatureHighlight();
+
   useEffect(() => {
     // Set page title
     document.title = "Date Cont - Super Vara";
+
+    // Mark the account section feature as seen when the user visits this page
+    markFeatureSeen("accountSection");
 
     // Load initial profile data
     const fetchProfileData = async () => {
@@ -103,7 +114,7 @@ export default function Admin() {
 
   const handleUpdateSecret = async () => {
     setSecretError("");
-    
+
     if (newParentSecret !== confirmParentSecret) {
       setSecretError("Codurile secrete nu se potrivesc.");
       return;
@@ -113,7 +124,7 @@ export default function Admin() {
       setSecretError("Codul secret trebuie să aibă cel puțin 4 caractere.");
       return;
     }
-    
+
     setIsUpdatingSecret(true);
     try {
       await updateParentSecret(newParentSecret);
@@ -182,9 +193,11 @@ export default function Admin() {
         <div className="space-y-8">
           <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-800">Informații Cont</h2>
+              <h2 className="text-xl font-bold text-gray-800">
+                Informații Cont
+              </h2>
             </div>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -227,9 +240,11 @@ export default function Admin() {
 
           <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-800">Cod Secret Părinte</h2>
+              <h2 className="text-xl font-bold text-gray-800">
+                Cod Secret Părinte
+              </h2>
             </div>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -252,7 +267,8 @@ export default function Admin() {
                   </button>
                 </div>
                 <p className="text-sm text-gray-500 mt-1">
-                  Acesta este codul secret folosit pentru accesul la panoul de părinte.
+                  Acesta este codul secret folosit pentru accesul la panoul de
+                  părinte.
                 </p>
               </div>
 
@@ -287,19 +303,27 @@ export default function Admin() {
 
               <button
                 onClick={handleUpdateSecret}
-                disabled={isUpdatingSecret || !newParentSecret.trim() || !confirmParentSecret.trim()}
+                disabled={
+                  isUpdatingSecret ||
+                  !newParentSecret.trim() ||
+                  !confirmParentSecret.trim()
+                }
                 className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
               >
-                {isUpdatingSecret ? "Se actualizează..." : "Actualizează codul secret"}
+                {isUpdatingSecret
+                  ? "Se actualizează..."
+                  : "Actualizează codul secret"}
               </button>
             </div>
           </div>
 
           <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-red-600">Zona Periculoasă</h2>
+              <h2 className="text-xl font-bold text-red-600">
+                Zona Periculoasă
+              </h2>
             </div>
-            
+
             <div className="space-y-4">
               <div className="p-4 bg-red-50 rounded-lg border border-red-200">
                 <p className="text-sm text-gray-700">
@@ -308,7 +332,7 @@ export default function Admin() {
                   acțiune nu poate fi anulată.
                 </p>
               </div>
-              
+
               <button
                 onClick={() => setShowDeleteDialog(true)}
                 disabled={isDeletingAccount}
@@ -323,10 +347,13 @@ export default function Admin() {
         {showDeleteDialog && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-              <h2 className="text-xl font-bold mb-4">Confirmare ștergere cont</h2>
+              <h2 className="text-xl font-bold mb-4">
+                Confirmare ștergere cont
+              </h2>
               <div className="space-y-4">
                 <p className="text-red-600 font-semibold">
-                  ATENȚIE! Această acțiune va șterge definitiv contul și toate datele asociate!
+                  ATENȚIE! Această acțiune va șterge definitiv contul și toate
+                  datele asociate!
                 </p>
                 <ul className="list-disc pl-5 space-y-2">
                   <li>Toți copiii vor fi șterși definitiv</li>
@@ -335,7 +362,8 @@ export default function Admin() {
                   <li>Profilul contului va fi șters complet</li>
                 </ul>
                 <p className="font-medium">
-                  Această acțiune nu poate fi anulată și nu există posibilitatea de recuperare ulterioară!
+                  Această acțiune nu poate fi anulată și nu există posibilitatea
+                  de recuperare ulterioară!
                 </p>
               </div>
               <div className="flex gap-2 mt-6 justify-end">

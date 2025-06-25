@@ -1,9 +1,38 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* Mature design system with subtle, professional colors */
+
+/* Feature highlight animation */
+@keyframes pulse-blue-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+.feature-highlight {
+  animation: pulse-blue-glow 2s infinite;
+  position: relative;
+}
+
+.feature-highlight::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  z-index: -1;
+  background: rgba(59, 130, 246, 0.1);
+}
 
 @layer base {
   :root {
@@ -84,7 +113,7 @@
 
   body {
     @apply bg-gray-50 text-foreground;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
   }
 }
 
@@ -92,27 +121,27 @@
   .mature-gradient-blue {
     @apply bg-gradient-to-r from-blue-500 to-blue-600;
   }
-  
+
   .mature-gradient-green {
     @apply bg-gradient-to-r from-green-500 to-green-600;
   }
-  
+
   .mature-gradient-orange {
     @apply bg-gradient-to-r from-orange-500 to-orange-600;
   }
-  
+
   .mature-gradient-purple {
     @apply bg-gradient-to-r from-indigo-500 to-indigo-600;
   }
-  
+
   .mature-gradient-pink {
     @apply bg-gradient-to-r from-pink-600 to-pink-700;
   }
-  
+
   .hover-lift {
     @apply transition-all duration-200 hover:scale-105 hover:shadow-md;
   }
-  
+
   .fade-in {
     animation: fade-in 0.3s ease-out;
   }

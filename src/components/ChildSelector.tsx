@@ -1,5 +1,6 @@
 import React from "react";
 import { Child, CompletedActivity } from "@/hooks/useSupabaseData";
+import { useFeatureHighlight } from "@/hooks/useFeatureHighlight";
 
 interface ChildSelectorProps {
   children: Child[];
@@ -16,6 +17,9 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({
   onParentMode,
   familyName,
 }) => {
+  const { hasSeenFeature } = useFeatureHighlight();
+  const showAccountFeatureHighlight = !hasSeenFeature("accountSection");
+
   const getTotalPointsEarned = (childId: string) => {
     return completedActivities
       .filter((ca) => ca.child_id === childId)
@@ -88,9 +92,19 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({
 
       <button
         onClick={onParentMode}
-        className="text-gray-500 hover:text-gray-700 underline transition-colors duration-200"
+        className={`text-gray-500 hover:text-gray-700 underline transition-colors duration-200 relative px-4 py-2 rounded-lg
+          ${
+            showAccountFeatureHighlight
+              ? "feature-highlight font-medium text-blue-600 hover:text-blue-800"
+              : ""
+          }`}
       >
         Acces părinte
+        {showAccountFeatureHighlight && (
+          <span className="absolute -top-2 -right-2 text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">
+            Nou
+          </span>
+        )}
       </button>
     </div>
   );

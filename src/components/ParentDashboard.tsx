@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import exampleActivities from "../../activitati.json";
 import { compressImage } from "@/lib/imageCompression";
+import { useFeatureHighlight } from "@/hooks/useFeatureHighlight";
 
 interface ParentDashboardProps {
   children: Child[];
@@ -67,6 +68,9 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
   familyName,
   discardActivity,
 }) => {
+  const { hasSeenFeature } = useFeatureHighlight();
+  const showAccountFeatureHighlight = !hasSeenFeature("accountSection");
+
   const [showAddChild, setShowAddChild] = useState(false);
   const [showAddActivity, setShowAddActivity] = useState(false);
   const [newChildName, setNewChildName] = useState("");
@@ -802,9 +806,15 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
           {onNukeAccount && (
             <button
               onClick={onNukeAccount}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-2 rounded-lg font-medium shadow-lg transition-colors duration-200 min-w-[200px] text-center"
+              className={`bg-blue-500 hover:bg-blue-600 text-white px-8 py-2 rounded-lg font-medium shadow-lg transition-colors duration-200 min-w-[200px] text-center relative
+                ${showAccountFeatureHighlight ? "feature-highlight" : ""}`}
             >
               Date cont
+              {showAccountFeatureHighlight && (
+                <span className="absolute -top-2 -right-2 text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold">
+                  Nou
+                </span>
+              )}
             </button>
           )}
         </div>
