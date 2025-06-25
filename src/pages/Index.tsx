@@ -7,7 +7,6 @@ import ParentDashboard from "../components/ParentDashboard";
 import { useAuth } from "@/hooks/useAuth";
 import { useSupabaseData, Child } from "@/hooks/useSupabaseData";
 import { supabase } from "@/integrations/supabase/client";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const Index = () => {
   const navigate = useNavigate();
