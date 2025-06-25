@@ -444,6 +444,109 @@ export const useSupabaseData = () => {
     }
   };
 
+  const deleteAccount = async () => {
+    if (!user) return;
+
+    try {
+      // Get all children for the user
+      const { data: childrenData } = await supabase
+        .from("children")
+        .select("id")
+        .eq("parent_id", user.id);
+
+      const childIds = (childrenData || []).map((c: any) => c.id);
+
+      // Delete all completed activities for user's children
+      if (childIds.length > 0) {
+        await supabase
+          .from("completed_activities")
+          .delete()
+          .in("child_id", childIds);
+      }
+
+      // Delete all children
+      await supabase.from("children").delete().eq("parent_id", user.id);
+
+      // Delete all activities
+      await supabase.from("activities").delete().eq("parent_id", user.id);
+
+      // Delete profile
+      await supabase.from("profiles").delete().eq("id", user.id);
+
+      // Sign out user (auth cleanup will be handled by the Auth hook)
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      throw error;
+    }
+  };
+
+  const updateAccountName = async (newName: string) => {
+    if (!user || !newName.trim()) return;
+
+    try {
+      // Update profile in the profiles table
+      const { error } = await supabase
+        .from("profiles")
+        .update({ full_name: newName.trim() })
+        .eq("id", user.id);
+
+      if (error) throw error;
+
+      // Also update the user metadata in auth
+      const { error: authError } = await supabase.auth.updateUser({
+        data: { full_name: newName.trim() },
+      });
+
+      if (authError) throw authError;
+    } catch (error) {
+      console.error("Error updating account name:", error);
+      throw error;
+    }
+  };
+
+  const updateParentSecret = async (newSecret: string) => {
+    if (!user || !newSecret.trim()) return;
+
+    try {
+      // Update secret in the profiles table
+      const { error } = await supabase
+        .from("profiles")
+        .update({ secret: newSecret.trim() })
+        .eq("id", user.id);
+
+      if (error) throw error;
+
+      // Also update the user metadata in auth
+      const { error: authError } = await supabase.auth.updateUser({
+        data: { secret: newSecret.trim() },
+      });
+
+      if (authError) throw authError;
+    } catch (error) {
+      console.error("Error updating parent secret:", error);
+      throw error;
+    }
+  };
+
+  const getParentSecret = async (): Promise<string | null> => {
+    if (!user) return null;
+
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("secret")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw error;
+      return data?.secret || null;
+    } catch (error) {
+      console.error("Error fetching parent secret:", error);
+      throw error;
+    }
+  };
+
   return {
     loading,
     children,
@@ -460,5 +563,9 @@ export const useSupabaseData = () => {
     editChild,
     discardActivity,
     refetch: fetchData,
+    deleteAccount,
+    updateAccountName,
+    updateParentSecret,
+    getParentSecret,
   };
 };

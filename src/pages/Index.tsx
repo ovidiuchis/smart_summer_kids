@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import ChildSelector from "../components/ChildSelector";
 import ChildDashboard from "../components/ChildDashboard";
@@ -9,6 +9,7 @@ import { useSupabaseData, Child } from "@/hooks/useSupabaseData";
 import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
+  const navigate = useNavigate();
   const { user, loading: authLoading, signOut } = useAuth();
   const {
     loading,
@@ -174,9 +175,9 @@ const Index = () => {
     await signOut();
   };
 
-  // NUKE account handler
-  const handleNukeAccount = async () => {
-    setNukeSecretPrompt(true);
+  // Navigate to Admin page for account management
+  const handleNukeAccount = () => {
+    navigate("/admin");
   };
 
   const handleNukeSecretSubmit = async (e: React.FormEvent) => {

@@ -802,9 +802,9 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
           {onNukeAccount && (
             <button
               onClick={onNukeAccount}
-              className="bg-black hover:bg-red-700 text-white px-8 py-2 rounded-lg font-medium shadow-lg transition-colors duration-200 min-w-[200px] text-center"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-2 rounded-lg font-medium shadow-lg transition-colors duration-200 min-w-[200px] text-center"
             >
-              🧨 Șterge tot contul
+              Date cont
             </button>
           )}
         </div>
