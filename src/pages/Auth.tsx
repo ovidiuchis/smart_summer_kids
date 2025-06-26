@@ -3,6 +3,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -136,7 +142,7 @@ const Auth = () => {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Familia Popescu"
+                  placeholder="Popescu"
                   autoComplete="family-name"
                   required
                 />
@@ -200,12 +206,30 @@ const Auth = () => {
 
             {!isLogin && (
               <div>
-                <label
-                  htmlFor="secret"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Cod acces părinte (secret)
-                </label>
+                <div className="flex items-center gap-1 mb-1">
+                  <label
+                    htmlFor="secret"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Cod secret părinte
+                  </label>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-blue-500 rounded-full cursor-help">
+                          i
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-slate-800 text-white border-slate-800">
+                        <p className="max-w-xs text-xs">
+                          Codul secret pentru părinte va fi folosit pentru a
+                          accesa panoul de administrare a aplicației
+                          (adăugare/modificare copii, activități, ș.a.m.d)
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
                 <input
                   type="password"
                   id="secret"
