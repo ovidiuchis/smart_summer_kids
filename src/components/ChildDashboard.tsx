@@ -76,7 +76,9 @@ const ChildDashboard: React.FC<ChildDashboardProps> = ({
             <span>Salut {child.name}!</span>
           </span>
         }
-        subtitle={`Ai ${child.total_points} puncte în total!`}
+        subtitle={`Ai ${
+          child.total_points !== null && child.total_points >= 0 ? "+" : ""
+        }${child.total_points} puncte în total!`}
         rightElement={
           <button
             onClick={onBack}
@@ -157,8 +159,15 @@ const ChildDashboard: React.FC<ChildDashboardProps> = ({
                     <span className="text-gray-700">{ca.activity?.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-green-600 font-bold">
-                      +{ca.points_earned} puncte
+                    <span
+                      className={`font-bold ${
+                        ca.points_earned >= 0
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {ca.points_earned >= 0 ? "+" : "−"}
+                      {Math.abs(ca.points_earned)} puncte
                     </span>
                     {ca.approved_by_parent ? (
                       <span className="text-green-600">✅</span>

@@ -40,6 +40,47 @@ const Index = () => {
 
   const sessionStart = React.useRef(performance.now());
 
+  // Prevent PWA exit on Android back button press
+  useEffect(() => {
+    // Create a dummy history entry on app initialization that we can navigate back to
+    // This ensures there's always a history entry to "go back to" without exiting the app
+    if (typeof window !== "undefined") {
+      window.history.pushState({ noExit: true }, "");
+    }
+
+    const handleBackButton = (event: PopStateEvent) => {
+      // If we detect a back button press (through popstate)
+      if (typeof window !== "undefined") {
+        // Prevent the PWA from exiting by pushing another state
+        window.history.pushState({ noExit: true }, "");
+
+        // Handle in-app navigation
+        if (selectedChild) {
+          // If we're in a child dashboard, go back to selector
+          setSelectedChild(null);
+          console.log("[NAVIGATION] Back button: Child Dashboard → Child Selector");
+        } else if (isParentMode) {
+          // If we're in parent mode, go back to selector
+          setIsParentMode(false);
+          console.log("[NAVIGATION] Back button: Parent Dashboard → Child Selector");
+        } else {
+          // If we're already at the root, show a toast or some UI indication
+          console.log("[NAVIGATION] Back button pressed at root level, staying in app");
+          // Here you could add a toast notification: "Press again to exit"
+          // Or implement a double-press to exit mechanism
+        }
+      }
+    };
+
+    // Listen for history state changes (Android back button triggers this)
+    window.addEventListener("popstate", handleBackButton);
+
+    // Cleanup the event listener
+    return () => {
+      window.removeEventListener("popstate", handleBackButton);
+    };
+  }, [selectedChild, isParentMode]);
+
   // Timeout fallback: always at top level, never after a return!
   useEffect(() => {
     if (!loading && !authLoading && !user) return; // already handled

@@ -220,8 +220,13 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
 
         <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
           <div className="text-2xl mb-2 text-center">⭐</div>
-          <div className="text-2xl font-bold text-gray-800 text-center">
-            {totalPointsEarned}
+          <div
+            className={`text-2xl font-bold text-center ${
+              totalPointsEarned >= 0 ? "text-gray-800" : "text-red-600"
+            }`}
+          >
+            {totalPointsEarned >= 0 ? "+" : "−"}
+            {Math.abs(totalPointsEarned)}
           </div>
           <div className="text-gray-600 text-center text-sm">
             Puncte câștigate
@@ -281,8 +286,13 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="text-sm font-semibold text-blue-600">
-                    +{ca.points_earned} puncte
+                  <div
+                    className={`text-sm font-semibold ${
+                      ca.points_earned >= 0 ? "text-blue-600" : "text-red-600"
+                    }`}
+                  >
+                    {ca.points_earned >= 0 ? "+" : "−"}
+                    {Math.abs(ca.points_earned)} puncte
                   </div>
                   <button
                     onClick={() => onApproveActivity(ca.id)}
@@ -406,8 +416,13 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
               </div>
               <div className="flex items-center space-x-4">
                 <div className="text-right">
-                  <div className="text-xl font-bold text-gray-800">
-                    {child.total_points}
+                  <div
+                    className={`text-xl font-bold ${
+                      child.total_points >= 0 ? "text-gray-800" : "text-red-600"
+                    }`}
+                  >
+                    {child.total_points >= 0 ? "+" : "−"}
+                    {Math.abs(child.total_points)}
                   </div>
                   <div className="text-xs text-gray-600">puncte totale</div>
                 </div>
@@ -487,7 +502,6 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                     })
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  min="1"
                 />
               </div>
               <div>
@@ -585,8 +599,13 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
               <div className="flex items-center justify-between mb-2">
                 <div className="text-xl">{activity.emoji}</div>
                 <div className="flex items-center gap-2">
-                  <div className="text-sm font-semibold text-blue-600">
-                    +{activity.points} pts
+                  <div
+                    className={`text-sm font-semibold ${
+                      activity.points >= 0 ? "text-blue-600" : "text-red-600"
+                    }`}
+                  >
+                    {activity.points >= 0 ? "+" : ""}
+                    {activity.points} pts
                   </div>
                   <button
                     onClick={() => onRemoveActivity(activity.id)}
