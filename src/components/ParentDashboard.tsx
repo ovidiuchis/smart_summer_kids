@@ -436,14 +436,12 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 >
                   <DollarSign size={16} />
                 </button>
-                {!isDemo && (
-                  <button
-                    onClick={() => onRemoveChild(child.id)}
-                    className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors duration-200"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                )}
+                <button
+                  onClick={() => onRemoveChild(child.id)}
+                  className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors duration-200"
+                >
+                  <Trash2 size={16} />
+                </button>
                 <button
                   onClick={() =>
                     setEditChild({
@@ -609,8 +607,8 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                       activity.points >= 0 ? "text-blue-600" : "text-red-600"
                     }`}
                   >
-                    {activity.points >= 0 ? "+" : ""}
-                    {activity.points} pts
+                    {activity.points >= 0 ? "+" : "−"}
+                    {Math.abs(activity.points)} pts
                   </div>
                   <button
                     onClick={() => onRemoveActivity(activity.id)}
@@ -695,7 +693,7 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                       points: Number(e.target.value),
                     })
                   }
-                  min={1}
+
                 />
               </div>
               <div className="flex gap-2 items-center">

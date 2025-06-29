@@ -3,6 +3,7 @@ import React from "react";
 interface HeaderProps {
   title: React.ReactNode;
   subtitle?: string;
+  subtitleIsNegative?: boolean;
   rightElement?: React.ReactNode;
   familyName?: string;
   isDemo?: boolean;
@@ -11,6 +12,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({
   title,
   subtitle,
+  subtitleIsNegative = false,
   rightElement,
   familyName,
   isDemo,
@@ -24,7 +26,17 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         )}
         <h1 className="text-4xl font-bold text-gray-800 mb-2">{title}</h1>
-        {subtitle && <p className="text-lg text-gray-600">{subtitle}</p>}
+        {subtitle && (
+          <p
+            className={`text-lg ${
+              subtitleIsNegative
+                ? "text-red-600 font-semibold"
+                : "text-gray-600"
+            }`}
+          >
+            {subtitle}
+          </p>
+        )}
         {familyName && (
           <div className="text-xl font-semibold text-blue-700 mt-1">
             👨‍👩‍👧‍👦 Familia {familyName}

@@ -80,7 +80,8 @@ const ChildDashboard: React.FC<ChildDashboardProps> = ({
         }
         subtitle={`Ai ${
           child.total_points !== null && child.total_points >= 0 ? "+" : "−"
-        }${child.total_points} puncte în total!`}
+        }${Math.abs(child.total_points)} puncte în total!`}
+        subtitleIsNegative={child.total_points < 0}
         rightElement={
           <button
             onClick={onBack}
