@@ -3,6 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { compressImage } from "@/lib/imageCompression";
 
+export interface UserProfile {
+  id: string;
+  full_name: string;
+  secret: string;
+  demoaccount: boolean;
+}
+
 export interface Child {
   id: string;
   parent_id: string;
@@ -46,6 +53,7 @@ export const useSupabaseData = () => {
   const [completedActivities, setCompletedActivities] = useState<
     CompletedActivity[]
   >([]);
+  const [isDemo, setIsDemo] = useState<boolean>(false);
 
   const fetchData = async () => {
     if (!user) {
@@ -55,6 +63,16 @@ export const useSupabaseData = () => {
 
     try {
       setLoading(true);
+
+      // Check if this is a demo account
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("demoaccount")
+        .eq("id", user.id)
+        .single();
+
+      if (profileError) throw profileError;
+      setIsDemo(profileData?.demoaccount || false);
 
       // Fetch children
       const { data: childrenData, error: childrenError } = await supabase
@@ -552,6 +570,7 @@ export const useSupabaseData = () => {
     children,
     activities,
     completedActivities,
+    isDemo,
     addChild,
     removeChild,
     addActivity,

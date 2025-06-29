@@ -48,6 +48,7 @@ interface ParentDashboardProps {
   onNukeAccount?: () => void;
   familyName?: string;
   discardActivity: (completedActivityId: string) => Promise<void>;
+  isDemo?: boolean;
 }
 
 const ParentDashboard: React.FC<ParentDashboardProps> = ({
@@ -67,6 +68,7 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
   onNukeAccount,
   familyName,
   discardActivity,
+  isDemo = false,
 }) => {
   const { hasSeenFeature } = useFeatureHighlight();
   const showAccountFeatureHighlight = !hasSeenFeature("accountSection");
@@ -207,6 +209,7 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
           </div>
         }
         familyName={familyName}
+        isDemo={isDemo}
       />
       {/* Overview Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -433,12 +436,14 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 >
                   <DollarSign size={16} />
                 </button>
-                <button
-                  onClick={() => onRemoveChild(child.id)}
-                  className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors duration-200"
-                >
-                  <Trash2 size={16} />
-                </button>
+                {!isDemo && (
+                  <button
+                    onClick={() => onRemoveChild(child.id)}
+                    className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors duration-200"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
                 <button
                   onClick={() =>
                     setEditChild({
@@ -822,7 +827,7 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
               Deconectează-te
             </button>
           )}
-          {onNukeAccount && (
+          {onNukeAccount && !isDemo && (
             <button
               onClick={onNukeAccount}
               className={`bg-blue-500 hover:bg-blue-600 text-white px-8 py-2 rounded-lg font-medium shadow-lg transition-colors duration-200 min-w-[200px] text-center relative

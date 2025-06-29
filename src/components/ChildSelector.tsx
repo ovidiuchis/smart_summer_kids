@@ -1,6 +1,8 @@
 import React from "react";
 import { Child, CompletedActivity } from "@/hooks/useSupabaseData";
 import { useFeatureHighlight } from "@/hooks/useFeatureHighlight";
+import Header from "./Header";
+import { LogOut } from "lucide-react";
 
 interface ChildSelectorProps {
   children: Child[];
@@ -8,6 +10,8 @@ interface ChildSelectorProps {
   onChildSelect: (child: Child) => void;
   onParentMode: () => void;
   familyName?: string;
+  isDemo?: boolean;
+  onSignOut?: () => void;
 }
 
 const ChildSelector: React.FC<ChildSelectorProps> = ({
@@ -16,6 +20,8 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({
   onChildSelect,
   onParentMode,
   familyName,
+  isDemo = false,
+  onSignOut,
 }) => {
   const { hasSeenFeature } = useFeatureHighlight();
   const showAccountFeatureHighlight = !hasSeenFeature("accountSection");
@@ -28,7 +34,25 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({
 
   return (
     <div className="text-center animate-fade-in">
-      <div className="mb-8">
+      <div className="flex justify-end mb-4">
+        {isDemo && onSignOut && (
+          <button
+            onClick={onSignOut}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
+            title="Deconectează-te"
+          >
+            <LogOut size={16} />
+            Deconectează-te
+          </button>
+        )}
+      </div>
+
+      <div className="mb-8 relative">
+        {isDemo && (
+          <div className="absolute top-0 right-2 bg-yellow-400 text-black px-4 py-1 rounded-full font-bold text-md transform rotate-12 shadow-md inline-block">
+            DEMO
+          </div>
+        )}
         <h1 className="text-5xl font-bold text-gray-800 mb-4">
           🌟 Tracker Activități de Vară 🌟
         </h1>

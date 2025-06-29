@@ -9,6 +9,7 @@ interface ChildDashboardProps {
   completedActivities: CompletedActivity[];
   onBack: () => void;
   onCompleteActivity: (activityId: string) => void;
+  isDemo?: boolean;
 }
 
 const ChildDashboard: React.FC<ChildDashboardProps> = ({
@@ -17,6 +18,7 @@ const ChildDashboard: React.FC<ChildDashboardProps> = ({
   completedActivities,
   onBack,
   onCompleteActivity,
+  isDemo = false,
 }) => {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
@@ -77,7 +79,7 @@ const ChildDashboard: React.FC<ChildDashboardProps> = ({
           </span>
         }
         subtitle={`Ai ${
-          child.total_points !== null && child.total_points >= 0 ? "+" : ""
+          child.total_points !== null && child.total_points >= 0 ? "+" : "−"
         }${child.total_points} puncte în total!`}
         rightElement={
           <button
@@ -87,6 +89,7 @@ const ChildDashboard: React.FC<ChildDashboardProps> = ({
             ← Înapoi
           </button>
         }
+        isDemo={isDemo}
       />
 
       {/* Date selector */}

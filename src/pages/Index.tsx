@@ -16,6 +16,7 @@ const Index = () => {
     children,
     activities,
     completedActivities,
+    isDemo,
     addChild,
     removeChild,
     addActivity,
@@ -58,14 +59,20 @@ const Index = () => {
         if (selectedChild) {
           // If we're in a child dashboard, go back to selector
           setSelectedChild(null);
-          console.log("[NAVIGATION] Back button: Child Dashboard → Child Selector");
+          console.log(
+            "[NAVIGATION] Back button: Child Dashboard → Child Selector"
+          );
         } else if (isParentMode) {
           // If we're in parent mode, go back to selector
           setIsParentMode(false);
-          console.log("[NAVIGATION] Back button: Parent Dashboard → Child Selector");
+          console.log(
+            "[NAVIGATION] Back button: Parent Dashboard → Child Selector"
+          );
         } else {
           // If we're already at the root, show a toast or some UI indication
-          console.log("[NAVIGATION] Back button pressed at root level, staying in app");
+          console.log(
+            "[NAVIGATION] Back button pressed at root level, staying in app"
+          );
           // Here you could add a toast notification: "Press again to exit"
           // Or implement a double-press to exit mechanism
         }
@@ -294,6 +301,8 @@ const Index = () => {
           onChildSelect={handleChildSelect}
           onParentMode={handleParentMode}
           familyName={familyName}
+          isDemo={isDemo}
+          onSignOut={handleSignOut}
         />
       )}
 
@@ -304,6 +313,7 @@ const Index = () => {
           completedActivities={completedActivities}
           onBack={handleBack}
           onCompleteActivity={handleCompleteActivity}
+          isDemo={isDemo}
         />
       )}
 
@@ -325,6 +335,7 @@ const Index = () => {
           onNukeAccount={handleNukeAccount}
           familyName={familyName}
           discardActivity={discardActivity}
+          isDemo={isDemo}
         />
       )}
 
