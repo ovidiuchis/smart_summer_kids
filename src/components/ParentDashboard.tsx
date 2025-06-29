@@ -436,12 +436,14 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 >
                   <DollarSign size={16} />
                 </button>
-                <button
-                  onClick={() => onRemoveChild(child.id)}
-                  className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors duration-200"
-                >
-                  <Trash2 size={16} />
-                </button>
+                {!isDemo && (
+                  <button
+                    onClick={() => onRemoveChild(child.id)}
+                    className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors duration-200"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
                 <button
                   onClick={() =>
                     setEditChild({
