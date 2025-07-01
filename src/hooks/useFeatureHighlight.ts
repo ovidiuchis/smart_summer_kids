@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 // Features that can be highlighted
-export type FeatureKey = "accountSection";
+export type FeatureKey = "accountSection" | "partialPayout";
 
 // Hook to track which features have been seen by the user
 export const useFeatureHighlight = () => {

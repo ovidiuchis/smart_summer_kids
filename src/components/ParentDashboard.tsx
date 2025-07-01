@@ -70,8 +70,9 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
   discardActivity,
   isDemo = false,
 }) => {
-  const { hasSeenFeature } = useFeatureHighlight();
+  const { hasSeenFeature, markFeatureSeen } = useFeatureHighlight();
   const showAccountFeatureHighlight = !hasSeenFeature("accountSection");
+  const showPartialPayoutHighlight = !hasSeenFeature("partialPayout");
 
   const [showAddChild, setShowAddChild] = useState(false);
   const [showAddActivity, setShowAddActivity] = useState(false);
@@ -435,8 +436,13 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                   onClick={() => {
                     setPayoutChildId(child.id);
                     setPayoutAmount(child.total_points);
+                    if (showPartialPayoutHighlight) {
+                      markFeatureSeen("partialPayout");
+                    }
                   }}
-                  className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg transition-colors duration-200"
+                  className={`bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg transition-colors duration-200 ${
+                    showPartialPayoutHighlight ? "feature-highlight" : ""
+                  }`}
                   title="Plătește punctele"
                 >
                   <DollarSign size={16} />
