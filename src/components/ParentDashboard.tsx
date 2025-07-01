@@ -695,7 +695,6 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                       points: Number(e.target.value),
                     })
                   }
-
                 />
               </div>
               <div className="flex gap-2 items-center">

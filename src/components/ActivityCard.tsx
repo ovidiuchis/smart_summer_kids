@@ -41,7 +41,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
         <div className="text-3xl">{activity.emoji}</div>
         <div
           className={`px-3 py-1 rounded-full text-white text-sm font-semibold ${
-            activity.points >= 0 ? getCategoryColor(activity.category) : "bg-red-500"
+            activity.points >= 0
+              ? getCategoryColor(activity.category)
+              : "bg-red-500"
           }`}
         >
           {activity.points >= 0 ? "+" : "−"}
