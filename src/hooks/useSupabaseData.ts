@@ -324,20 +324,37 @@ export const useSupabaseData = () => {
     }
   };
 
-  const payoutPoints = async (childId: string) => {
+  const payoutPoints = async (childId: string, amount?: number) => {
     try {
+      // Find the child to get current points
+      const child = children.find((c) => c.id === childId);
+      if (!child) throw new Error("Child not found");
+
+      // If amount is not provided or is greater than available points, reset to 0
+      // Otherwise subtract the specified amount
+      const newTotalPoints =
+        amount !== undefined ? Math.max(0, child.total_points - amount) : 0;
+
       const { error } = await supabase
         .from("children")
-        .update({ total_points: 0, updated_at: new Date().toISOString() })
+        .update({
+          total_points: newTotalPoints,
+          updated_at: new Date().toISOString(),
+        })
         .eq("id", childId);
 
       if (error) throw error;
 
       setChildren((prev) =>
         prev.map((child) =>
-          child.id === childId ? { ...child, total_points: 0 } : child
+          child.id === childId
+            ? { ...child, total_points: newTotalPoints }
+            : child
         )
       );
+
+      // Return the amount that was actually paid out
+      return child.total_points - newTotalPoints;
     } catch (error) {
       console.error("Error paying out points:", error);
       throw error;

@@ -30,7 +30,7 @@ interface ParentDashboardProps {
   }) => void;
   onRemoveActivity: (activityId: string) => void;
   onApproveActivity: (completedActivityId: string) => void;
-  onPayoutPoints: (childId: string) => void;
+  onPayoutPoints: (childId: string, amount?: number) => void;
   onSignOut?: () => void;
   onEditActivity?: (activity: {
     id: string;
@@ -98,6 +98,8 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
     avatar_url: string | null;
   }>(null);
   const [showPopulateExamples, setShowPopulateExamples] = useState(false);
+  const [payoutChildId, setPayoutChildId] = useState<string | null>(null);
+  const [payoutAmount, setPayoutAmount] = useState(0);
 
   const totalPointsEarned = children.reduce(
     (sum, child) => sum + child.total_points,
@@ -430,9 +432,12 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                   <div className="text-xs text-gray-600">puncte totale</div>
                 </div>
                 <button
-                  onClick={() => onPayoutPoints(child.id)}
+                  onClick={() => {
+                    setPayoutChildId(child.id);
+                    setPayoutAmount(child.total_points);
+                  }}
                   className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg transition-colors duration-200"
-                  title="Plătește punctele (resetează la 0)"
+                  title="Plătește punctele"
                 >
                   <DollarSign size={16} />
                 </button>
@@ -810,6 +815,58 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({
                 className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
               >
                 Salvează
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Payout Points Modal */}
+      {payoutChildId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Plătește puncte</h2>
+            <div className="space-y-4">
+              <p className="text-gray-600">
+                {children.find((c) => c.id === payoutChildId)?.name} are{" "}
+                <span className="font-bold">
+                  {children.find((c) => c.id === payoutChildId)?.total_points}
+                </span>{" "}
+                puncte. Cât dorești să plătești?
+              </p>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Puncte de plătit
+                </label>
+                <input
+                  type="number"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  min="0"
+                  max={
+                    children.find((c) => c.id === payoutChildId)
+                      ?.total_points || 0
+                  }
+                  value={payoutAmount}
+                  onChange={(e) =>
+                    setPayoutAmount(parseInt(e.target.value) || 0)
+                  }
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-6 justify-end">
+              <button
+                onClick={() => setPayoutChildId(null)}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
+              >
+                Anulează
+              </button>
+              <button
+                onClick={() => {
+                  onPayoutPoints(payoutChildId, payoutAmount);
+                  setPayoutChildId(null);
+                }}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+              >
+                Plătește
               </button>
             </div>
           </div>
