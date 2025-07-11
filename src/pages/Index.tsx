@@ -213,9 +213,9 @@ const Index = () => {
     setIsParentMode(false);
   };
 
-  const handleCompleteActivity = async (activityId: string) => {
+  const handleCompleteActivity = async (activityId: string, selectedDate?: string) => {
     if (selectedChild) {
-      await completeActivity(selectedChild.id, activityId);
+      await completeActivity(selectedChild.id, activityId, selectedDate);
     }
   };
 
