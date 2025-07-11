@@ -8,7 +8,7 @@ interface ChildDashboardProps {
   activities: Activity[];
   completedActivities: CompletedActivity[];
   onBack: () => void;
-  onCompleteActivity: (activityId: string) => void;
+  onCompleteActivity: (activityId: string, selectedDate?: string) => void;
   isDemo?: boolean;
 }
 
@@ -186,11 +186,16 @@ const ChildDashboard: React.FC<ChildDashboardProps> = ({
         )}
       </div>
 
-      {/* Activities Grid - only show for today */}
-      {selectedDate === new Date().toISOString().split("T")[0] && (
+      {/* Activities Grid - show for today and yesterday */}
+      {(selectedDate === new Date().toISOString().split("T")[0] || 
+        selectedDate === (() => {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          return yesterday.toISOString().split("T")[0];
+        })()) && (
         <div>
           <h3 className="text-2xl font-bold text-gray-800 mb-6">
-            Activități disponibile astăzi:
+            Activități disponibile pentru {formatDate(selectedDate)}:
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {activities.map((activity) => (

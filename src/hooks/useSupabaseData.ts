@@ -256,12 +256,12 @@ export const useSupabaseData = () => {
     }
   };
 
-  const completeActivity = async (childId: string, activityId: string) => {
+  const completeActivity = async (childId: string, activityId: string, completedDate?: string) => {
     try {
       const activity = activities.find((a) => a.id === activityId);
       if (!activity) return;
 
-      const today = new Date().toISOString().split("T")[0];
+      const dateToUse = completedDate || new Date().toISOString().split("T")[0];
 
       const { data, error } = await supabase
         .from("completed_activities")
@@ -269,7 +269,7 @@ export const useSupabaseData = () => {
           {
             child_id: childId,
             activity_id: activityId,
-            completed_date: today,
+            completed_date: dateToUse,
             points_earned: activity.points,
             approved_by_parent: false,
           },
