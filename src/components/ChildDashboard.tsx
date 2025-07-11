@@ -33,6 +33,17 @@ const ChildDashboard: React.FC<ChildDashboardProps> = ({
   const progressPercentage =
     totalAvailable > 0 ? (completedToday.length / totalAvailable) * 100 : 0;
 
+  // Handle activity completion with selected date context
+  const handleCompleteActivity = (activityId: string) => {
+    // Pass the selected date if it's not today
+    const today = new Date().toISOString().split("T")[0];
+    if (selectedDate === today) {
+      onCompleteActivity(activityId);
+    } else {
+      onCompleteActivity(activityId, selectedDate);
+    }
+  };
+
   // Get last 7 days for date selection
   const getLastWeekDates = () => {
     const dates = [];
@@ -186,29 +197,22 @@ const ChildDashboard: React.FC<ChildDashboardProps> = ({
         )}
       </div>
 
-      {/* Activities Grid - show for today and yesterday */}
-      {(selectedDate === new Date().toISOString().split("T")[0] || 
-        selectedDate === (() => {
-          const yesterday = new Date();
-          yesterday.setDate(yesterday.getDate() - 1);
-          return yesterday.toISOString().split("T")[0];
-        })()) && (
-        <div>
-          <h3 className="text-2xl font-bold text-gray-800 mb-6">
-            Activități disponibile pentru {formatDate(selectedDate)}:
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {activities.map((activity) => (
-              <ActivityCard
-                key={activity.id}
-                activity={activity}
-                isCompleted={completedActivityIds.includes(activity.id)}
-                onComplete={onCompleteActivity}
-              />
-            ))}
-          </div>
+      {/* Activities Grid - always show all activities */}
+      <div>
+        <h3 className="text-2xl font-bold text-gray-800 mb-6">
+          Activități disponibile pentru {formatDate(selectedDate)}:
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {activities.map((activity) => (
+            <ActivityCard
+              key={activity.id}
+              activity={activity}
+              isCompleted={completedActivityIds.includes(activity.id)}
+              onComplete={handleCompleteActivity}
+            />
+          ))}
         </div>
-      )}
+      </div>
     </div>
   );
 };
