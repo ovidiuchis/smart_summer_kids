@@ -35,13 +35,7 @@ Built with modern, performant technologies:
 
 You have multiple ways to edit and improve your application:
 
-### 1️⃣ Use Lovable Dev (no code)
-
-* Visit your [Lovable Project](https://lovable.dev/projects/dfd9cd33-5879-45b1-ace8-4e84a6d807b7).
-* Prompt changes directly.
-* All changes are committed automatically.
-
-### 2️⃣ Edit Locally with Your IDE
+###  Edit Locally with Your IDE
 
 > Requirements: Node.js & npm (recommended install via [nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
 
@@ -58,19 +52,6 @@ npm install
 # Start local development server
 npm run dev
 ```
-
-### 3️⃣ Edit Directly on GitHub
-
-* Navigate to any file in your repo.
-* Click ✏️ Edit, make your changes, and commit.
-
-### 4️⃣ Use GitHub Codespaces
-
-* Open your repository.
-* Click **Code > Codespaces > New codespace**.
-* Edit fully online.
-
----
 
 ## 🌎 Deployment
 
